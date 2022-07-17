@@ -1,0 +1,30 @@
+{
+  "name": "lab1-8",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TrKhoa/NJS101x_01-A_VN.git"
+  },
+  "author": "Tran Mac Tu Khoa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TrKhoa/NJS101x_01-A_VN/issues"
+  },
+  "homepage": "https://github.com/TrKhoa/NJS101x_01-A_VN#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-handlebars": "3.0",
+    "pug": "^3.0.2"
+  }
+}
