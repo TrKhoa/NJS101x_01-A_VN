@@ -2,7 +2,25 @@ const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
 
-function hour(time) {
+function msToTime(time) {
+    var ms = time % 1000;
+    time = (time - ms) / 1000;
+    var secs = time % 60;
+    time = (time - secs) / 60;
+    var mins = time % 60;
+    var hrs = (time - mins) / 60;
+    return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
+}
+
+function dateFormat(date){
+    return date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
+}
+
+function toHour(time) {
+    return (new Date(time)).getHours();
+}
+
+function toMilis(time) {
     return time * 60 * 60 * 1000;
 }
 
@@ -15,36 +33,63 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getTodayHistory = (req, res, next) => {
-    const date = new Date().toDateString();
-    const currDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    const nextDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + (date.getDate() + 1);
-    Work.find({
-            userId: req.user,
-            startAt: {
-                $gte: currDate,
-                $lte: nextDate
-            }
+    const currDate = new Date(new Date().toDateString());
+
+    const annualLeave = AnnualLeave.find({userId: req.user});
+
+    const user = User.findById(req.user);
+
+    const work = Work.find({
+            userId: req.user
         })
         .sort({
             startAt: -1
         })
         .then(data => {
-            let i = 0;
-            let workTime = 0;
-            while (data[i]) {
-                workTime += data[0].workTime.getMinutes();
-                i++;
-            }
-            res.render('MH-1/history', {
-                user: req.user.name,
-                data: data,
-                date: currDate,
-                workTime: workTime,
-                pageTitle: 'MH-1',
-                path: '/MH-1'
-            });
+            return data;
         })
         .catch(err => console.log(err));
+
+    const attendance = User
+    .findById(req.user)
+    .populate('attendance.works')
+    .then(data=>{
+        for(var i=0;data.attendance[i];i++){
+            const time = data.attendance[i].date.getTime();
+            if(time == currDate.getTime()){
+                return data.attendance[i];
+                break;
+            }
+        }
+    })
+
+    Promise.all([work,attendance]).then((values) => {
+        const getWork = values[0];
+        const getAttendance = values[1];;
+        let workTime = 0;
+        let timeLeaving = 0;
+        let overTime = 0;
+        const latestWork = getWork[0];
+        if(getAttendance){
+            workTime = getAttendance.workTime.getTime();
+            timeLeaving = getAttendance.timeLeaving;
+        }
+        if(timeLeaving>0){
+            workTime += toMilis(timeLeaving);
+        }
+        if (workTime > toMilis(8)) {
+            overTime = workTime - toMilis(8);
+        }
+        res.render('MH-1/history', {
+            user: req.user.name,
+            data: getWork,
+            date: dateFormat(currDate),
+            workTime: msToTime(workTime),
+            pageTitle: 'MH-1',
+            path: '/MH-1'
+        });
+    })
+
 }
 
 exports.getProfile = (req, res, next) => {
@@ -61,113 +106,6 @@ exports.getProfile = (req, res, next) => {
         })
         .catch(err => console.log(err));
 }
-/*
-exports.getDashboard = (req, res, next) => {
-    const currDate = new Date(new Date().toDateString());
-    let annualLeave = [];
-    let leaveTime = [];
-    AnnualLeave.
-    find({userId:req.user})
-    .then(result=>{
-        for(var i=0;result[i];i++){
-            annualLeave = annualLeave.concat(result[i].date);
-            leaveTime = leaveTime.concat(result[i].time);
-        }
-    })
-    .then(result=>{
-        Work.find({
-                userId: req.user
-            })
-            .sort({
-                startAt: -1
-            })
-            .then(data => {
-                function hour(time){
-                    return time*60*60*1000;
-                }
-                let workTime = 0;
-                let overTime = 0;
-                const latestWork = data[0];
-                for(var i = 0; data[i] && data[i].workTime;i++){
-                    if(data[i].startAt > currDate)
-                        workTime += data[i].workTime.getTime();
-                }
-                for(var i = 0; annualLeave[i] && leaveTime[i];i++){
-                    if(currDate.toDateString() == annualLeave[i].toDateString()){
-                        const time = hour(leaveTime[i]);
-                        workTime = workTime + time;
-                    }
-                }
-                if(workTime>hour(8)){
-                    overTime = workTime - hour(8);
-                }
-                const shownDate = currDate.getDate()+"/"+(currDate.getMonth()+1)+"/"+currDate.getFullYear();
-                res.render('MH-3/dashboard', {
-                    user: req.user.name,
-                    data: data,
-                    date: shownDate,
-                    workTime: workTime,
-                    overTime: overTime,
-                    lastestWork: latestWork,
-                    annualLeave: annualLeave,
-                    leaveTime: leaveTime,
-                    pageTitle: 'MH-3',
-                    path: '/MH-3'
-                });
-            })
-            .catch(err => console.log(err));
-    })
-    .catch(err=>console.log(err));
-}
-*/
-/*
-exports.getDashboard = (req, res, next) => {
-    const currDate = new Date(new Date().toDateString());
-    const annualLeave =[];
-
-    Work.find({
-            userId: req.user
-        })
-        .sort({
-            startAt: -1
-        })
-        .then(data => {
-            function hour(time) {
-                return time * 60 * 60 * 1000;
-            }
-            let workTime = 0;
-            let overTime = 0;
-            const latestWork = data[0];
-            for (var i = 0; data[i] && data[i].workTime; i++) {
-                if (data[i].startAt > currDate)
-                    workTime += data[i].workTime.getTime();
-            }
-            for (var i = 0; annualLeave[i] && leaveTime[i]; i++) {
-                if (currDate.toDateString() == annualLeave[i].toDateString()) {
-                    const time = hour(leaveTime[i]);
-                    workTime = workTime + time;
-                }
-            }
-            if (workTime > hour(8)) {
-                overTime = workTime - hour(8);
-            }
-            const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
-            res.render('MH-3/dashboard', {
-                user: req.user.name,
-                data: data,
-                date: shownDate,
-                workTime:0,
-                overTime: overTime,
-                lastestWork: latestWork,
-                annualLeave: 0,
-                leaveTime: 0,
-                pageTitle: 'MH-3',
-                path: '/MH-3'
-            });
-        })
-        .catch(err => console.log(err));
-}
-*/
 
 exports.getDashboard = (req, res, next) => {
     const currDate = new Date(new Date().toDateString());
@@ -207,15 +145,19 @@ exports.getDashboard = (req, res, next) => {
         const getAnnualLeave = values[3];
         const month = req.query.month;
         const salary = req.query.salary;
-        let workTime = getAttendance.workTime.getTime();
-        const timeLeaving = getAttendance.timeLeaving;
+        let workTime = 0;
+        let timeLeaving = 0;
         let overTime = 0;
         const latestWork = getWork[0];
-        if(timeLeaving>0){
-            workTime += hour(timeLeaving);
+        if(getAttendance){
+            workTime = getAttendance.workTime.getTime();
+            timeLeaving = getAttendance.timeLeaving;
         }
-        if (workTime > hour(8)) {
-            overTime = workTime - hour(8);
+        if(timeLeaving>0){
+            workTime += toMilis(timeLeaving);
+        }
+        if (workTime > toMilis(8)) {
+            overTime = workTime - toMilis(8);
         }
         const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
         res.render('MH-3/dashboard', {

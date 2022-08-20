@@ -1,4 +1,31 @@
 <%- include('../includes/head.ejs') %>
+<%
+function msToTime(time) {
+    var ms = time % 1000;
+    time = (time - ms) / 1000;
+    var secs = time % 60;
+    time = (time - secs) / 60;
+    var mins = time % 60;
+    var hrs = (time - mins) / 60;
+    return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
+}
+
+function dateFormat(date){
+    return date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear();
+}
+
+function timeFormat(time){
+    return time.getHours()+" giờ "+time.getMinutes()+" phút";
+}
+
+function toMilis(time) {
+    return time * 60 * 60 * 1000;
+}
+
+function toHour(time) {
+    return (new Date(time)).getHours();
+}
+%>
 </head>
 
 <body>
@@ -20,11 +47,11 @@
                 <% data.forEach(val=> { %>
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
-                        <div class="fw-bold">Ngày: <%= val.startAt.getDate()+"/"+(val.startAt.getMonth()+1)+"/"+val.startAt.getFullYear() %></div>
+                        <div class="fw-bold">Ngày: <%= dateFormat(val.startAt) %></div>
                         Nơi làm việc: <% if(val.location == 1) {%> Tại cơ quan <% } else { %> Tại nhà <% } %><br>
-                        Bắt đầu lúc: <%= val.startAt.getHours()+" giờ "+val.startAt.getMinutes()+" phút"%><br>
-                        Kết thúc lúc: <%= val.endAt.getHours()+" giờ "+val.endAt.getMinutes()+" phút"%><br>
-                        Làm việc trong: <%= val.workTime.getMinutes() %>
+                        Bắt đầu lúc: <%= timeFormat(val.startAt) %><br>
+                        Kết thúc lúc: <%= timeFormat(val.endAt) %><br>
+                        Làm việc trong: <%= msToTime(val.workTime.getTime()) %>
                     </div>
                 </li>
                 <% }) %>

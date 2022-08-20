@@ -17,6 +17,10 @@ function msToTime(time) {
     return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
 }
 
+function dateFormat(date){
+    return date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
+}
+
 function toMilis(time) {
     return time * 60 * 60 * 1000;
 }
