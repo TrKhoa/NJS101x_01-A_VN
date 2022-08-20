@@ -1,0 +1,97 @@
+<%- include('../includes/head.ejs') %>
+<%
+    function msToTime(time) {
+      var ms = time % 1000;
+      time = (time - ms) / 1000;
+      var secs = time % 60;
+      time = (time - secs) / 60;
+      var mins = time % 60;
+      var hrs = (time - mins) / 60;
+      return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
+    }
+
+    const todayWork = data;
+    console.log(data);
+%>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <div class="container">
+        <div class="row centered">
+            <h1>Đăng ký thông tin tiêm vaccine</h1>
+        </div>
+        <div class="row">
+            <div class="card mt-5 col-md-10 p-md-5 offset-md-1">
+                <div class="row no-gutters">
+                    <form action="/MH-4/vaccine-register" method="post">
+                        <div class="row mb-4">
+                            <div class="col">
+                                <h3>Ngày: <%= date %></h3>
+                                <p>Hôm nay đã làm việc được: <%= todayWork  %></p>
+                                <p>Số giờ làm thêm: <%= msToTime(overTime) %></p>
+                            </div>
+                            <div class="col">
+                                <h3>Danh sách ngày nghỉ:</h3>
+                                <% if(annualLeave && leaveTime){
+                                    annualLeave.forEach(date => {%>
+                                        <%= date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear() %><br>
+                                    <%});
+
+                                }%>
+                            </div>
+                            <div class="col">
+                                <h3>Lần điểm danh cuối:</h3>
+                                <p>Bắt đầu lúc:
+                                    <% if(!lastestWork)
+                                        {%> -- <%}
+                                    else
+                                        {%><%= lastestWork.startAt.getHours()+" giờ "+lastestWork.startAt.getMinutes()+" phút" %></p>
+                                <%}%>
+
+                                <p>Kết thúc lúc:
+                                    <% if(!lastestWork || !lastestWork.endAt)
+                                        {%> -- <%}
+                                    else
+                                        {%><%=lastestWork.endAt.getHours()+" giờ "+lastestWork.endAt.getMinutes()+" phút"%>
+                                <%}%>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Text input -->
+                        <d iv class="form-outline mb-4">
+                            <div class="row">
+                                <h3>Lịch sử làm việc</h3>
+                                <ol class="list-group list-group-numbered">
+                                    <% data.forEach(val=> { %>
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">Ngày: <%= val.startAt.getDate()+"/"+(val.startAt.getMonth()+1)+"/"+val.startAt.getFullYear() %></div>
+                                        Nơi làm việc: <% if(val.location == 1) {%> Tại cơ quan <% } else { %> Tại nhà <% } %><br>
+                                        Bắt đầu lúc: <%= val.startAt.getHours()+" giờ "+val.startAt.getMinutes()+" phút"%><br>
+                                        Kết thúc lúc:
+                                        <% if(!val.endAt)
+                                                    {%> -- <%}
+                                                else
+                                                    {%><%=val.endAt.getHours()+" giờ "+val.endAt.getMinutes()+" phút"%>
+                                        <%}%>
+                                            <br>
+                                            Làm việc trong:
+                                                <% if(!val.endAt)
+                                                    {%> -- <%}
+                                                else
+                                                    {%><%=msToTime(val.workTime.getTime())%>
+                                        <%}%>
+                                        </div>
+                                    </li>
+                                    <% }) %>
+                                        </ol>
+                                    </div>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../includes/end.ejs') %>

@@ -1,0 +1,84 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <% if(errMessage) { %>
+    <div class="alert alert-danger">
+        <strong>Có lỗi!</strong> <%= errMessage %>
+    </div>
+    <% } %>
+    <div class="container">
+        <div class="row centered">
+            <h1>Thông tin bệnh nhân F0</h1>
+        </div>
+        <div class="row">
+            <div class="card mt-5 col-md-8 p-md-5 offset-md-2">
+                <div class="row no-gutters">
+                    <form action="/MH-4/covid-report" method="post">
+                        <!-- Text input -->
+                        <div class="row mb-4">
+                            <div class="col">
+                                <p>Tên: <%= user.name %></p>
+                            </div>
+                            <div class="col">
+                                <p>Ngày sinh: <%= user.dob.getDate()+"/"+(user.dob.getMonth()+1)+"/"+user.dob.getFullYear() %></p>
+                            </div>
+                            <div class="col">
+                                <p>Số mũi Vaccine: <%= user.vaccineCount %></p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <label class="form-label" for="address">Địa chỉ cách ly:</label>
+                            <input type="text" id="address" name="address" class="form-control" required/>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label class="form-label" for="wasF0">Đã từng là F0:</label><br>
+                                    <input class="form-check-input" type="radio" name="wasF0" id="wasF0" value=1>
+                                    <label class="form-check-label" for="wasF0">Có</label>
+                                    <input class="form-check-input" type="radio" name="wasF0" id="wasF02" value=0 checked>
+                                    <label class="form-check-label" for="wasF02" checked>Không</label><br>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="quickTest">Test Nhanh:</label><br>
+                                    <input class="form-check-input" type="radio" name="quickTest" id="quickTest" value=1 checked>
+                                    <label class="form-check-label" for="quickTest">Có</label>
+                                    <input class="form-check-input" type="radio" name="quickTest" id="quickTest2" value=0>
+                                    <label class="form-check-label" for="quickTest2">Không</label><br>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="pcr">RT-PCR:</label><br>
+                                    <input class="form-check-input" type="radio" name="prc" id="pcr" value=1>
+                                    <label class="form-check-label" for="pcr"> Có </label>
+                                    <input class="form-check-input" type="radio" name="prc" id="pcr2" value=0 checked>
+                                    <label class="form-check-label" for="pcr2"> Không </label><br>
+                                </div>
+
+                            </div>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="month">Số tháng từng là F0:</label>
+                                    <input type="number" id="month" name="month" class="form-control" />
+                                </div>
+                                <div class="form-outline">
+                                    <label class="form-label" for="dateTest:">Ngày test nhanh dương tính</label>
+                                    <input type="date" id="dateTest:" name="dateTest:" class="form-control" />
+                                </div>
+                                <div class="form-outline">
+                                    <label class="form-label" for="datePrc">Ngày RT-PCR dương tính:</label>
+                                    <input type="date" id="datePrc" name="datePrc" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mb-4">Xác nhận</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../includes/end.ejs') %>

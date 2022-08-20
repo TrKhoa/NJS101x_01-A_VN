@@ -1,0 +1,46 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <div class="container">
+        <div class="row centered">
+            <h1>Thông tin người dùng</h1>
+        </div>
+        <div class="row">
+            <div class="card mt-5 col-md-8 offset-md-2">
+                <div class="row no-gutters">
+                    <div class="col-md-6">
+                        <img src="<%= user.imageUrl %>" class="card-img" alt="ảnh đại diện">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h5 class="card-title"><h2><%= user.name %></h2></h5>
+                            <p class="card-text">Ngày sinh: <%= user.dob.getDate()+"/"+user.dob.getMonth()+"/"+user.dob.getFullYear() %></p>
+                            <p class="card-text">Salary Scale: <%= user.salaryScale %></p>
+                            <p class="card-text">Ngày bắt đầu làm: <%= user.startDate.getDate()+"/"+user.startDate.getMonth()+"/"+user.startDate.getFullYear() %>
+                            <p class="card-text">Phòng ban: <%= user.department %></p>
+                            <p class="card-text">Số ngày nghỉ phép còn lại: <%= user.annualLeave %></p>
+                            <% if(edit){%>
+                            <form class="" action="/MH-2/profile" method="POST">
+                                <label for="imageUrl">Đường dẫn hình ảnh:</label>
+                                <input type="text" class="form-control input" name="imageUrl" required>
+                            <% } %>
+                            <% if(!edit){%>
+                                <a href="/MH-2/profile?edit=true">
+                            <% } %>
+                                    <button class="btn btn-primary" type="<% if(edit){%> submit <% } else { %> button <% } %>" name="button">
+                                        <% if(edit){%> Xác nhận <% } else { %> Chỉnh sửa ảnh <% } %>
+                                    </button
+                            <% if(!edit){ %>
+                                </a>
+                            <% } %>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../includes/end.ejs') %>

@@ -1,0 +1,46 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <div class="container">
+        <div class="row centered">
+            <h1>Nghỉ Phép</h1>
+            <h4>Số ngày nghỉ còn lại: <%= remainDay %></h4>
+        </div>
+        <div class="row">
+            <form class="col-md-4 m-3 mx-auto" action="/MH-1/annualLeave" method="post">
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Ngày nghỉ</label>
+                    <input type="date" class="form-control input" name="offDay1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Số giờ nghỉ:</label>
+                    <input type="number" min=0 max=8 class="form-control input" name="offTime1" placeholder="Giờ" required>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Thêm ngày nghỉ 1(Tùy chọn)</label>
+                    <input type="date" class="form-control input" name="offDay2">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Số giờ nghỉ:</label>
+                    <input type="number" min=0 max=8 class="form-control input" name="offTime2" placeholder="Giờ">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Thêm ngày nghỉ 2(Tùy chọn)</label>
+                    <input type="date" class="form-control input" name="offDay3">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Số giờ nghỉ:</label>
+                    <input type="number" min=0 max=8 class="form-control input" name="offTime3" placeholder="Giờ">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Lý do</label>
+                    <textarea class="form-control" name="reason" rows="3"></textarea>
+                </div>
+                <button class="btn btn-outline-primary" type="submit">Xác nhận</button>
+            </form>
+        </div>
+    </div>
+
+    <%- include('../includes/end.ejs') %>

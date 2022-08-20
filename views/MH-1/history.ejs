@@ -1,0 +1,34 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 my-md-5">
+                <h3 class="centered">Danh sách điểm danh cá nhân trong ngày <%= date %>:</h3>
+            </div>
+            <div class="col-md-6">
+                <h3 class="centered">Nhân viên: <%= user %></h3>
+            </div>
+            <div class="col-md-6">
+                <h3 class="centered">Hôm nay đã làm được: <%= workTime %> phút</h3>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="list-group list-group-numbered">
+                <% data.forEach(val=> { %>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Ngày: <%= val.startAt.getDate()+"/"+(val.startAt.getMonth()+1)+"/"+val.startAt.getFullYear() %></div>
+                        Nơi làm việc: <% if(val.location == 1) {%> Tại cơ quan <% } else { %> Tại nhà <% } %><br>
+                        Bắt đầu lúc: <%= val.startAt.getHours()+" giờ "+val.startAt.getMinutes()+" phút"%><br>
+                        Kết thúc lúc: <%= val.endAt.getHours()+" giờ "+val.endAt.getMinutes()+" phút"%><br>
+                        Làm việc trong: <%= val.workTime.getMinutes() %>
+                    </div>
+                </li>
+                <% }) %>
+            </ol>
+        </div>
+    </div>
+    <%- include('../includes/end.ejs') %>

@@ -1,0 +1,92 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <div class="container">
+        <div class="row centered">
+            <% if(errMessage) { %>
+            <div class="alert alert-danger">
+                <strong>Có lỗi!</strong> <%= errMessage %>
+            </div>
+            <% } %>
+            <h1>Đăng ký thông tin tiêm vaccine</h1>
+        </div>
+        <div class="row">
+            <div class="card mt-5 col-md-8 p-md-5 offset-md-2">
+                <div class="row no-gutters">
+                    <form action="/MH-4/vaccine-register" method="post">
+                        <div class="row mb-4">
+                            <h3>Thông tin mũi <%= vaccineCount+1 %>:</h3>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="vaccineType1">Loại Vaccine</label>
+                                    <select class="custom-select form-control" id="vaccineType1" name="vaccineType1" required>
+                                        <option value="0">Chọn Vaccine</option>
+                                        <option value="1">Astrazeneca</option>
+                                        <option value="2">Pfizer</option>
+                                        <option value="3">France</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="vaccineId1">Số lô</label>
+                                    <input type="text" id="vaccineId1" name="vaccineId1" class="form-control" placeholder="Số lô" required/>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="date1">Ngày tiêm</label>
+                                    <input type="date" id="date1" name="date1" class="form-control" required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Text input -->
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="location1">Nơi tiêm Vaccine</label>
+                            <input type="text" id="location1" name="location1" class="form-control" required/>
+                        </div>
+
+                        <div class="row mb-4">
+                            <h3>Thông tin mũi <%= vaccineCount+2 %>(Nếu có):</h3>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="vaccineType2">Loại Vaccine</label>
+                                    <select class="custom-select form-control" id="vaccineType2" name="vaccineType2">
+                                        <option value="0">Chọn Vaccine</option>
+                                        <option value="1">Astrazeneca</option>
+                                        <option value="2">Pfizer</option>
+                                        <option value="3">France</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="vaccineId2">Số lô</label>
+                                    <input type="text" id="vaccineId2" name="vaccineId2" class="form-control" placeholder="Số lô" />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="date2">Ngày tiêm</label>
+                                    <input type="date" id="date2" name="date2" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Text input -->
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="location2">Nơi tiêm Vaccine</label>
+                            <input type="text" id="location2" name="location2" class="form-control" />
+                        </div>
+
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary btn-block mb-4">Xác nhận</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../includes/end.ejs') %>
