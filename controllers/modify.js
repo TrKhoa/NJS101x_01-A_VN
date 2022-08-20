@@ -7,6 +7,24 @@ const CovidReport = require('../models/covidreport');
 
 const alert = require('alert');
 
+function msToTime(time) {
+    var ms = time % 1000;
+    time = (time - ms) / 1000;
+    var secs = time % 60;
+    time = (time - secs) / 60;
+    var mins = time % 60;
+    var hrs = (time - mins) / 60;
+    return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
+}
+
+function toMilis(time) {
+    return time * 60 * 60 * 1000;
+}
+
+function toHour(time) {
+    return (new Date(time)).getHours();
+}
+
 //Điếm dảnh và kết thúc ngày làm
 exports.getAttendance = (req, res, next) => {
     if (!req.user.status) {
@@ -132,30 +150,32 @@ exports.postAnnualLeave = (req, res, next) => {
             })
             .catch(err => console.log(err));
     }
-    const exec = new Promise(()=>{if (offDay1) {
-        Days += toDay(offTime1);
-        if (remainDay - Days >= 0)
-            addAnnualLeave(offDay1, offTime1, reason, userId);
-        else {
-            alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
+    const exec = new Promise(() => {
+        if (offDay1) {
+            Days += toDay(offTime1);
+            if (remainDay - Days >= 0)
+                addAnnualLeave(offDay1, offTime1, reason, userId);
+            else {
+                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
+            }
         }
-    }
-    if (offDay2) {
-        Days += toDay(offTime2);
-        if (remainDay - Days >= 0)
-            addAnnualLeave(offDay2, offTime2, reason, userId);
-        else {
-            alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
+        if (offDay2) {
+            Days += toDay(offTime2);
+            if (remainDay - Days >= 0)
+                addAnnualLeave(offDay2, offTime2, reason, userId);
+            else {
+                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
+            }
         }
-    }
-    if (offDay3) {
-        Days += toDay(offTime3);
-        if (remainDay - Days >= 0)
-            addAnnualLeave(offDay3, offTime3, reason, userId);
-        else {
-            alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép");
+        if (offDay3) {
+            Days += toDay(offTime3);
+            if (remainDay - Days >= 0)
+                addAnnualLeave(offDay3, offTime3, reason, userId);
+            else {
+                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép");
+            }
         }
-    }})
+    })
 
     exec.then(res.redirect('/'));
 }
@@ -173,6 +193,80 @@ exports.postProfile = (req, res, next) => {
             return res.redirect('/MH-2/profile');
         })
         .catch(err => console.log(err));
+}
+
+exports.postSalary = (req, res, next) => {
+    const currDate = new Date(new Date().toDateString());
+
+    const annualLeave = AnnualLeave.find({
+        userId: req.user
+    });
+
+    const user = User.findById(req.user);
+
+    const work = Work.find({
+            userId: req.user
+        })
+        .sort({
+            startAt: -1
+        })
+        .then(data => {
+            return data;
+        })
+        .catch(err => console.log(err));
+
+    const attendance = User
+        .findById(req.user)
+        .populate('attendance.works')
+        .then(data => {
+            for (var i = 0; data.attendance[i]; i++) {
+                const time = data.attendance[i].date.getTime();
+                if (time == currDate.getTime()) {
+                    return data.attendance[i];
+                    break;
+                }
+            }
+        })
+
+    Promise.all([user, work, attendance, annualLeave]).then((values) => {
+        const getUser = values[0]
+        const getWork = values[1];
+        const getAttendance = values[2];
+        const getAnnualLeave = values[3];
+        const user = req.user;
+        const dates = new Date(req.body.date);
+        const thisMonth = new Date().getMonth() + 1;
+        const thisYear = new Date().getFullYear();
+        const month = dates.getMonth() + 1;
+        const year = dates.getFullYear();
+        const salaryScale = user.salaryScale;
+        const timePerDay = toMilis(8);
+        let totalWorkTime = 0;
+        let totalAnnualTime = 0;
+        let overTime = 0;
+        for (var i = 0; getUser.attendance[i]; i++) {
+            const userData = getUser.attendance[i];
+            const checkMonth = userData.date.getMonth() + 1;
+            const checkYear = userData.date.getFullYear();
+            const workTime = userData.workTime.getTime();
+            if (checkMonth == month && checkYear == thisYear) {
+                console.log("OKKKKKK");
+            }
+        }
+        const basicIncome = 3000000;
+        const extraCred = 200000;
+        const timeRequiredPerMonth = timePerDay * 30;
+        let missingTime = totalWorkTime - timeRequiredPerMonth;
+        if (missingTime <= 0) {
+            missingTime = Math.abs(missingTime);
+        } else {
+            missingTime = 0;
+        }
+
+        const Salary = salaryScale * basicIncome + toHour(Math.abs(overTime - missingTime)) * extraCred;
+        return res.redirect('/MH-3?salary=' + Salary + "&month=" + month);
+    })
+
 }
 
 exports.getTemperatureResgister = (req, res, next) => {
@@ -246,7 +340,7 @@ exports.postVaccineRegister = (req, res, next) => {
             .catch(err => console.log(err));
     }
 
-    const exec = new Promise(()=>{
+    const exec = new Promise(() => {
         if (vaccineType1 != 0 && vaccineId1 !== '' && date1 != '' && location1 != '') {
             addVaccine(vaccineType1, vaccineId1, date1, location1, userId);
             if (vaccineType2 != 0 && vaccineId2 !== '' && date2 != '' && location2 != '') {
@@ -258,7 +352,7 @@ exports.postVaccineRegister = (req, res, next) => {
         }
     })
 
-    exec.then(()=>{
+    exec.then(() => {
         res.redirect('/');
     })
 }

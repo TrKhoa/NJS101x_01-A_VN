@@ -2,6 +2,10 @@ const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
 
+function hour(time) {
+    return time * 60 * 60 * 1000;
+}
+
 exports.getIndex = (req, res, next) => {
     res.render('MH-1/index', {
         working: req.user.status,
@@ -168,10 +172,9 @@ exports.getDashboard = (req, res, next) => {
 exports.getDashboard = (req, res, next) => {
     const currDate = new Date(new Date().toDateString());
 
-    const user = User.findById(req.user)
-        .then(result => {
-            return result;
-        });
+    const annualLeave = AnnualLeave.find({userId: req.user});
+
+    const user = User.findById(req.user);
 
     const work = Work.find({
             userId: req.user
@@ -197,13 +200,13 @@ exports.getDashboard = (req, res, next) => {
         }
     })
 
-    Promise.all([user,work,attendance]).then((values) => {
-        function hour(time) {
-            return time * 60 * 60 * 1000;
-        }
-
+    Promise.all([user,work,attendance,annualLeave]).then((values) => {
+        const getUser = values[0]
         const getWork = values[1];
         const getAttendance = values[2];
+        const getAnnualLeave = values[3];
+        const month = req.query.month;
+        const salary = req.query.salary;
         let workTime = getAttendance.workTime.getTime();
         const timeLeaving = getAttendance.timeLeaving;
         let overTime = 0;
@@ -216,13 +219,16 @@ exports.getDashboard = (req, res, next) => {
         }
         const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
         res.render('MH-3/dashboard', {
-            user: req.user.name,
+            user: getUser,
             work: getWork,
             date: shownDate,
             workTime: workTime,
             overTime: overTime,
+            leaveTime: timeLeaving,
             lastestWork: latestWork,
-            annualLeave: 0,
+            annualLeave: getAnnualLeave,
+            month: month,
+            salary: salary,
             pageTitle: 'MH-3',
             path: '/MH-3'
         });

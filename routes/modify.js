@@ -16,6 +16,8 @@ router.post('/MH-1/annualLeave', modifyController.postAnnualLeave);
 
 router.post('/MH-2/profile', modifyController.postProfile);
 
+router.post('/MH-3/salary', modifyController.postSalary);
+
 router.get('/MH-4/temperature-register', modifyController.getTemperatureResgister);
 
 router.post('/MH-4/temperature-register', modifyController.postTemperatureResgister);
