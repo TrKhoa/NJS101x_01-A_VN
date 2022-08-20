@@ -49,9 +49,9 @@ function toHour(time) {
                     <div class="ms-2 me-auto">
                         <div class="fw-bold">Ngày: <%= dateFormat(val.startAt) %></div>
                         Nơi làm việc: <% if(val.location == 1) {%> Tại cơ quan <% } else { %> Tại nhà <% } %><br>
-                        Bắt đầu lúc: <%= timeFormat(val.startAt) %><br>
-                        Kết thúc lúc: <%= timeFormat(val.endAt) %><br>
-                        Làm việc trong: <%= msToTime(val.workTime.getTime()) %>
+                        Bắt đầu lúc: <%if(val.startAt) {%><%= timeFormat(val.startAt) %><%} else {%> -- <% } %><br>
+                        Kết thúc lúc: <%if(val.endAt) {%><%= timeFormat(val.endAt) %><%} else {%> -- <% } %><br>
+                        Làm việc trong: <%if(val.workTime) {%><%= msToTime(val.workTime.getTime()) %><%} else {%> -- <% } %>
                     </div>
                 </li>
                 <% }) %>

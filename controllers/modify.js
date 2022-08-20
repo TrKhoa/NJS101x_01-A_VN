@@ -63,7 +63,7 @@ exports.getAttendance = (req, res, next) => {
                             })
                             .then(result => {
                                 console.log("Kết thúc phiên làm việc");
-                                return res.redirect('/MH-3');
+                                return res.redirect('/MH-1/history');
                             })
                     })
                     .catch(err => console.log(err));
@@ -267,8 +267,9 @@ exports.postSalary = (req, res, next) => {
             missingTime = 0;
         }
 
-        const Salary = salaryScale * basicIncome + toHour(Math.abs(overTime - missingTime)) * extraCred;
-        return res.redirect('/MH-3?salary=' + Salary + "&month=" + month);
+        const salary = salaryScale * basicIncome + toHour(Math.abs(overTime - missingTime)) * extraCred;
+        const fomula = salaryScale + "*"+ basicIncome +"+"+ "Math.abs("+toHour(overTime) +"-"+ toHour(missingTime)+") *"+ extraCred;
+        console.log(fomula);
     })
 
 }

@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById('630113c798d3ed5a085efd4e')
+    User.findById('630136dd5b35345c44aa8a53')
         .then(user => {
             req.user = user;
             const time = new Date();
@@ -59,7 +59,6 @@ mongoose
                 const user = new User({
                     name: 'Khoa',
                     dob: '2003-02-13',
-                    salaryScale: 0,
                     startDate: '2015-03-25',
                     department: 1,
                     annualLeave: 5,

@@ -14,7 +14,7 @@ const userSchema = new Schema({
     },
     salaryScale: {
         type: Number,
-        required: true
+        default: 1
     },
     startDate: {
         type: Date,
