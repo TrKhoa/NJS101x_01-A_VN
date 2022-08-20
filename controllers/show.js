@@ -166,28 +166,66 @@ exports.getDashboard = (req, res, next) => {
 */
 
 exports.getDashboard = (req, res, next) => {
-    const user1 = Work.find({
+    const currDate = new Date(new Date().toDateString());
+
+    const user = User.findById(req.user)
+        .then(result => {
+            return result;
+        });
+
+    const work = Work.find({
             userId: req.user
         })
         .sort({
             startAt: -1
         })
         .then(data => {
-            console.log(data);
             return data;
         })
         .catch(err => console.log(err));
-    const user2 = User.findById(req.user)
-        .then(data => {
-            data.find({attendance:})
+
+    const attendance = User
+    .findById(req.user)
+    .populate('attendance.works')
+    .then(data=>{
+        for(var i=0;data.attendance[i];i++){
+            const time = data.attendance[i].date.getTime();
+            if(time == currDate.getTime()){
+                return data.attendance[i];
+                break;
+            }
+        }
+    })
+
+    Promise.all([user,work,attendance]).then((values) => {
+        function hour(time) {
+            return time * 60 * 60 * 1000;
+        }
+
+        const getWork = values[1];
+        const getAttendance = values[2];
+        let workTime = getAttendance.workTime.getTime();
+        const timeLeaving = getAttendance.timeLeaving;
+        let overTime = 0;
+        const latestWork = getWork[0];
+        if(timeLeaving>0){
+            workTime += hour(timeLeaving);
+        }
+        if (workTime > hour(8)) {
+            overTime = workTime - hour(8);
+        }
+        const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
+        res.render('MH-3/dashboard', {
+            user: req.user.name,
+            work: getWork,
+            date: shownDate,
+            workTime: workTime,
+            overTime: overTime,
+            lastestWork: latestWork,
+            annualLeave: 0,
+            pageTitle: 'MH-3',
+            path: '/MH-3'
         });
-    const user3 = User.findById(req.user)
-        .then(result => {
-            return result;
-            console.log("3");
-        });
-    Promise.all([user2]).then((values) => {
-        console.log(values);
     });
 
 }

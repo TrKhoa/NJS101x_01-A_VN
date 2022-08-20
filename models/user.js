@@ -44,7 +44,7 @@ const userSchema = new Schema({
             ref: 'Work',
             required: true
         }],
-        annualLeave: [{
+        annualList: [{
             type: Schema.Types.ObjectId,
             ref: 'AnnualLeave'
         }],
@@ -113,7 +113,7 @@ userSchema.methods.addToAttendance = function(work) {
                     const date = {
                         date: currDate,
                         works: works,
-                        annualLeave: annualLeave,
+                        annualList: annualLeave,
                         timeLeaving: time,
                         workTime: workTime,
                     }
@@ -142,7 +142,7 @@ userSchema.methods.addToAttendance = function(work) {
                     const addWork = {
                         date: currDate,
                         works: newWorkId,
-                        annualLeave: annualLeave,
+                        annualList: annualLeave,
                         timeLeaving: time,
                         workTime: workTime
                     };
@@ -171,7 +171,7 @@ userSchema.methods.addToAttendance = function(work) {
                 const addWork = {
                     date: currDate,
                     works: newWorkId,
-                    annualLeave: annualLeave,
+                    annualList: annualLeave,
                     timeLeaving: time,
                     workTime: workTime
                 };
