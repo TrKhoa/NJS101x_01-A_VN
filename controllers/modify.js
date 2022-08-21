@@ -99,6 +99,7 @@ exports.getAnnualLeave = (req, res, next) => {
 }
 
 exports.postAnnualLeave = (req, res, next) => {
+    //Khai báo biến
     let Days = 0;
     const userId = req.user;
     const remainDay = req.user.annualLeave;
@@ -109,8 +110,10 @@ exports.postAnnualLeave = (req, res, next) => {
     const offTime2 = req.body.offTime2;
     const offTime3 = req.body.offTime3;
     const reason = req.body.reason;
+
+    //Tính số ngày
     const toDay = (Time) => {
-        const equalDay = 1 / (8 / Time);
+        const equalDay = 1 / (8 / Time); //Vì 1 ngày tương đương với 8 giờ
         return equalDay;
     }
 
@@ -135,32 +138,24 @@ exports.postAnnualLeave = (req, res, next) => {
             })
             .catch(err => console.log(err));
     }
+
+    function addAnnualLeaveToDB(offDay, offTime, reason, userId) {
+        if (offDay) {
+            Days += toDay(offTime);
+            if (remainDay - Days >= 0)
+                addAnnualLeave(offDay, offTime, reason, userId);
+            else {
+                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
+            }
+        }
+    }
+
+    //Chạy Promise
     const exec = new Promise(() => {
-        if (offDay1) {
-            Days += toDay(offTime1);
-            if (remainDay - Days >= 0)
-                addAnnualLeave(offDay1, offTime1, reason, userId);
-            else {
-                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
-            }
-        }
-        if (offDay2) {
-            Days += toDay(offTime2);
-            if (remainDay - Days >= 0)
-                addAnnualLeave(offDay2, offTime2, reason, userId);
-            else {
-                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
-            }
-        }
-        if (offDay3) {
-            Days += toDay(offTime3);
-            if (remainDay - Days >= 0)
-                addAnnualLeave(offDay3, offTime3, reason, userId);
-            else {
-                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép");
-            }
-        }
-    })
+        addAnnualLeaveToDB(offDay1, offTime1, reason, userId);
+        addAnnualLeaveToDB(offDay2, offTime2, reason, userId);
+        addAnnualLeaveToDB(offDay3, offTime3, reason, userId);
+    });
 
     exec.then(res.redirect('/'));
 }
@@ -204,13 +199,7 @@ exports.postSalary = (req, res, next) => {
         .findById(req.user)
         .populate('attendance.works')
         .then(data => {
-            for (var i = 0; data.attendance[i]; i++) {
-                const time = data.attendance[i].date.getTime();
-                if (time == currDate.getTime()) {
-                    return data.attendance[i];
-                    break;
-                }
-            }
+            return data.attendance;
         })
 
     Promise.all([user, work, attendance, annualLeave]).then((values) => {
@@ -219,14 +208,12 @@ exports.postSalary = (req, res, next) => {
         const getAttendance = values[2];
         const getAnnualLeave = values[3];
         const user = req.user;
-        //const noTime = exFunc.toUTC(new Date(0)).getTime();
         const dates = new Date(req.body.date);
         const thisMonth = new Date().getMonth() + 1;
         const thisYear = new Date().getFullYear();
         const month = dates.getMonth() + 1;
         const year = dates.getFullYear();
         const salaryScale = user.salaryScale;
-        //const timePerDay = new Date(exFunc.toMilis(8) - exFunc.toMilis(7)).getTime();
         let totalWorkTime = 0;
         let totalAnnualTime = 0;
         let totalOverTime = 0;
@@ -236,7 +223,7 @@ exports.postSalary = (req, res, next) => {
             const checkYear = userData.date.getFullYear();
             const workTime = exFunc.msToHours(userData.workTime.getTime());
             const timeRequiredPerDay = exFunc.toMilis(8);
-            const offTime = userData.timeLeaving;
+            let offTime = userData.timeLeaving;
             if (checkMonth == month && checkYear == thisYear) {
                 totalWorkTime += workTime;
                 totalAnnualTime += offTime;
@@ -257,8 +244,7 @@ exports.postSalary = (req, res, next) => {
         }
 
         const salary = salaryScale * basicIncome + (totalOverTime - missingTime) * extraCred;
-        alert(totalWorkTime +"+"+ totalAnnualTime +"-"+ timeRequiredPerMonth);
-        const fomula = encodeURIComponent(salaryScale + ' * ' + basicIncome + ' + (' + totalOverTime + '-' + missingTime + ') *    ' + extraCred);
+        const fomula = encodeURIComponent(salaryScale + ' * ' + basicIncome + ' + (' + totalOverTime + '- (' + totalWorkTime + "+" + totalAnnualTime + "-" + timeRequiredPerMonth + ')) *    ' + extraCred);
         res.redirect('/MH-3?salary=' + salary + '&fomula=' + fomula)
     })
 

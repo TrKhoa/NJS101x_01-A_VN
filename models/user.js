@@ -96,7 +96,7 @@ userSchema.methods.addToAttendance = function(work) {
                 })
                 .then((result) => {
                     for (var i = 0; result[i]; i++) {
-                        const checkDate =exFunc.toUTC(result[i].date).getTime();
+                        const checkDate = exFunc.toUTC(result[i].date).getTime();
                         if (checkDate == currDate.getTime()) {
                             const leaveId = result[i]._id;
                             const leaveTime = result[i].time;
@@ -104,6 +104,10 @@ userSchema.methods.addToAttendance = function(work) {
                             time += leaveTime;
                         }
                     }
+                    if (time > 8) {
+                        time = 8;
+                    }
+
                 })
                 .then(() => {
                     const date = {
@@ -128,7 +132,7 @@ userSchema.methods.addToAttendance = function(work) {
                 })
                 .then((result) => {
                     for (var i = 0; result[i]; i++) {
-                        const checkDate =exFunc.toUTC(result[i].date).getTime();
+                        const checkDate = exFunc.toUTC(result[i].date).getTime();
                         if (checkDate == currDate.getTime()) {
                             const leaveId = result[i]._id;
                             const leaveTime = result[i].time;
@@ -160,7 +164,7 @@ userSchema.methods.addToAttendance = function(work) {
             })
             .then((result) => {
                 for (var i = 0; result[i]; i++) {
-                    const checkDate =exFunc.toUTC(result[i].date).getTime();
+                    const checkDate = exFunc.toUTC(result[i].date).getTime();
                     if (checkDate == currDate.getTime()) {
                         const leaveId = result[i]._id;
                         const leaveTime = result[i].time;
