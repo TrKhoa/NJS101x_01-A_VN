@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const AnnualLeave = require('./annualleave');
-
 const Schema = mongoose.Schema;
+
+//Thêm các Functions tự viết
+const exFunc = require('../util/extraFunction');
 
 const userSchema = new Schema({
     name: {
@@ -63,15 +65,6 @@ const userSchema = new Schema({
 });
 
 userSchema.methods.addToAttendance = function(work) {
-    function msToTime(time) {
-        var ms = time % 1000;
-        time = (time - ms) / 1000;
-        var secs = time % 60;
-        time = (time - secs) / 60;
-        var mins = time % 60;
-        var hrs = (time - mins) / 60;
-        return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
-    }
     const newWorkId = work._id;
     const newWorkTime = work.workTime.getTime();
     const currDate = new Date(new Date().toDateString());
@@ -93,20 +86,23 @@ userSchema.methods.addToAttendance = function(work) {
             const lastTime = this.attendance[dateIndex].workTime.getTime();
             let workTime = lastTime;
             let annualLeave = [];
-            let time = 0;
+            let time = this.attendance[dateIndex].timeLeaving;
 
             works.push(newWorkId);
             workTime += newWorkTime;
 
             AnnualLeave.find({
-                    userId: this._id
+                    userId: this._id,
                 })
                 .then((result) => {
                     for (var i = 0; result[i]; i++) {
-                        const leaveId = result[i]._id;
-                        const leaveTime = result[i].time;
-                        annualLeave.push(leaveId);
-                        time += leaveTime;
+                        const checkDate =exFunc.toUTC(result[i].date).getTime();
+                        if (checkDate == currDate.getTime()) {
+                            const leaveId = result[i]._id;
+                            const leaveTime = result[i].time;
+                            annualLeave.push(leaveId);
+                            time += leaveTime;
+                        }
                     }
                 })
                 .then(() => {
@@ -128,14 +124,17 @@ userSchema.methods.addToAttendance = function(work) {
             let time = 0;
 
             AnnualLeave.find({
-                    userId: this._id
+                    userId: this._id,
                 })
                 .then((result) => {
                     for (var i = 0; result[i]; i++) {
-                        const leaveId = result[i]._id;
-                        const leaveTime = result[i].time;
-                        annualLeave.push(leaveId);
-                        time += leaveTime;
+                        const checkDate =exFunc.toUTC(result[i].date).getTime();
+                        if (checkDate == currDate.getTime()) {
+                            const leaveId = result[i]._id;
+                            const leaveTime = result[i].time;
+                            annualLeave.push(leaveId);
+                            time += leaveTime;
+                        }
                     }
                 })
                 .then(result => {
@@ -161,10 +160,13 @@ userSchema.methods.addToAttendance = function(work) {
             })
             .then((result) => {
                 for (var i = 0; result[i]; i++) {
-                    const leaveId = result[i]._id;
-                    const leaveTime = result[i].time;
-                    annualLeave.push(leaveId);
-                    time += leaveTime;
+                    const checkDate =exFunc.toUTC(result[i].date).getTime();
+                    if (checkDate == currDate.getTime()) {
+                        const leaveId = result[i]._id;
+                        const leaveTime = result[i].time;
+                        annualLeave.push(leaveId);
+                        time += leaveTime;
+                    }
                 }
             })
             .then(result => {

@@ -2,28 +2,12 @@ const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
 
-function msToTime(time) {
-    var ms = time % 1000;
-    time = (time - ms) / 1000;
-    var secs = time % 60;
-    time = (time - secs) / 60;
-    var mins = time % 60;
-    var hrs = (time - mins) / 60;
-    return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
-}
+//Thêm các Functions tự viết
+const exFunc = require('../util/extraFunction');
 
-function dateFormat(date){
-    return date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
-}
+const currDate = new Date(new Date().toDateString()); //Khai báo ngày hiện tại
 
-function toHour(time) {
-    return (new Date(time)).getHours();
-}
-
-function toMilis(time) {
-    return time * 60 * 60 * 1000;
-}
-
+//Render trang index(MH-1)
 exports.getIndex = (req, res, next) => {
     res.render('MH-1/index', {
         working: req.user.status,
@@ -32,71 +16,75 @@ exports.getIndex = (req, res, next) => {
     });
 }
 
+//Render trang history(MH-1)
 exports.getTodayHistory = (req, res, next) => {
-    const currDate = new Date(new Date().toDateString());
 
-    const annualLeave = AnnualLeave.find({userId: req.user});
+    //Lấy data từ collection AnnualLeave
+    const annualLeave = AnnualLeave.find({
+        userId: req.user
+    });
 
+    //Lấy data từ collection User
     const user = User.findById(req.user);
 
+    //Lấy data từ collection work
     const work = Work.find({
             userId: req.user
         })
         .sort({
-            startAt: -1
+            startAt: -1 //Xếp theo thứ tự Desc
         })
         .then(data => {
             return data;
         })
         .catch(err => console.log(err));
 
+    //Lấy data Attendance từ collection User
     const attendance = User
-    .findById(req.user)
-    .populate('attendance.works')
-    .then(data=>{
-        for(var i=0;data.attendance[i];i++){
-            const time = data.attendance[i].date.getTime();
-            if(time == currDate.getTime()){
-                return data.attendance[i];
-                break;
+        .findById(req.user)
+        .populate('attendance.works')
+        .then(data => {
+            for (var i = 0; data.attendance[i]; i++) {
+                const time = data.attendance[i].date.getTime();
+                if (time == currDate.getTime()) {
+                    return data.attendance[i];
+                    break;
+                }
             }
-        }
-    })
+        })
 
-    Promise.all([work,attendance]).then((values) => {
-        const getWork = values[0];
-        const getAttendance = values[1];;
-        let workTime = 0;
-        let timeLeaving = 0;
-        let overTime = 0;
-        const latestWork = getWork[0];
-        if(getAttendance){
-            workTime = getAttendance.workTime.getTime();
-            timeLeaving = getAttendance.timeLeaving;
-        }
-        if(timeLeaving>0){
-            workTime += toMilis(timeLeaving);
-        }
-        if (workTime > toMilis(8)) {
-            overTime = workTime - toMilis(8);
-        }
-        res.render('MH-1/history', {
-            user: req.user.name,
-            data: getWork,
-            date: dateFormat(currDate),
-            workTime: msToTime(workTime),
-            pageTitle: 'MH-1',
-            path: '/MH-1'
-        });
-    })
-
+    //Lấy data từ các Promise cần dùng cho vào 1 mảng
+    Promise.all([work, attendance])
+        //Truyển mảng vừa mới nhận được sau khi có đủ data
+        .then((values) => {
+            //Đặt tên cho các phần tử của mảng
+            const getWork = values[0];
+            const getAttendance = values[1];;
+            //Khai báo biến
+            let workTime = 0;
+            const latestWork = getWork[0];
+            //Nếu có data từ attendance thì gán data
+            if (getAttendance)
+                workTime = getAttendance.workTime.getTime();
+            //render
+            res.render('MH-1/history', {
+                user: req.user.name,
+                data: getWork,
+                date: exFunc.dateFormat(currDate),
+                workTime: exFunc.msToTime(workTime),
+                pageTitle: 'MH-1',
+                path: '/MH-1'
+            });
+        })
 }
 
+//Render trang profile(MH-2)
 exports.getProfile = (req, res, next) => {
-    let editMode = req.query.edit;
+    let editMode = req.query.edit; //Lấy edit từ url
     User
         .findById(req.user)
         .then(user => {
+            //render
             res.render('MH-2/profile', {
                 user: user,
                 edit: editMode,
@@ -107,77 +95,92 @@ exports.getProfile = (req, res, next) => {
         .catch(err => console.log(err));
 }
 
+//Render trang Dashboard(MH-3)
 exports.getDashboard = (req, res, next) => {
-    const currDate = new Date(new Date().toDateString());
 
-    const annualLeave = AnnualLeave.find({userId: req.user});
-
+    //Lấy data từ collection AnnualLeave
+    const annualLeave = AnnualLeave.find({
+        userId: req.user
+    });
+    //Lấy data từ collection User
     const user = User.findById(req.user);
 
+    //Lấy data từ collection Work
     const work = Work.find({
             userId: req.user
         })
         .sort({
-            startAt: -1
+            startAt: -1 //Xếp theo thứ tự Desc
         })
         .then(data => {
             return data;
         })
         .catch(err => console.log(err));
-
+    //Lấy data từ collection Attendance
     const attendance = User
-    .findById(req.user)
-    .populate('attendance.works')
-    .then(data=>{
-        for(var i=0;data.attendance[i];i++){
-            const time = data.attendance[i].date.getTime();
-            if(time == currDate.getTime()){
-                return data.attendance[i];
-                break;
+        .findById(req.user)
+        .populate('attendance.works') //điền dữ liệu bên trong tham chiếu
+        .then(data => {
+            for (var i = 0; data.attendance[i]; i++) {
+                const time = data.attendance[i].date.getTime();
+                if (time == currDate.getTime()) {
+                    return data.attendance[i];
+                    break;
+                }
             }
-        }
-    })
+        })
 
-    Promise.all([user,work,attendance,annualLeave]).then((values) => {
-        const getUser = values[0]
-        const getWork = values[1];
-        const getAttendance = values[2];
-        const getAnnualLeave = values[3];
-        const month = req.query.month;
-        const salary = req.query.salary;
-        let workTime = 0;
-        let timeLeaving = 0;
-        let overTime = 0;
-        const latestWork = getWork[0];
-        if(getAttendance){
-            workTime = getAttendance.workTime.getTime();
-            timeLeaving = getAttendance.timeLeaving;
-        }
-        if(timeLeaving>0){
-            workTime += toMilis(timeLeaving);
-        }
-        if (workTime > toMilis(8)) {
-            overTime = workTime - toMilis(8);
-        }
-        const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
-        res.render('MH-3/dashboard', {
-            user: getUser,
-            work: getWork,
-            date: shownDate,
-            workTime: workTime,
-            overTime: overTime,
-            leaveTime: timeLeaving,
-            lastestWork: latestWork,
-            annualLeave: getAnnualLeave,
-            month: month,
-            salary: salary,
-            pageTitle: 'MH-3',
-            path: '/MH-3'
+    //Lấy data từ các Promise cần dùng cho vào 1 mảng
+    Promise.all([user, work, attendance, annualLeave])
+        //Truyển mảng vừa mới nhận được sau khi có đủ data
+        .then((values) => {
+            //Đặt tên cho các phần tử của mảng
+            const getUser = values[0]
+            const getWork = values[1];
+            const getAttendance = values[2];
+            const getAnnualLeave = values[3];
+            //Khai báo biến
+            const month = req.query.month;
+            const salary = req.query.salary;
+            const fomula = req.query.fomula;
+            let workTime = 0;
+            let timeLeaving = 0;
+            let overTime = 0;
+            const latestWork = getWork[0];
+            //Nếu có data từ attendance thì gán data
+            if (getAttendance) {
+                workTime = getAttendance.workTime.getTime();
+                timeLeaving = getAttendance.timeLeaving;
+            }
+            //Nếu hôm nay có xin nghỉ
+            if (timeLeaving > 0) {
+                workTime += exFunc.toMilis(timeLeaving);
+            }
+            //Tính giờ làm thêm nếu có
+            if (workTime > exFunc.toMilis(8)) {
+                overTime = workTime - exFunc.toMilis(8);
+            }
+            const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
+            res.render('MH-3/dashboard', {
+                user: getUser,
+                work: getWork,
+                date: shownDate,
+                workTime: workTime,
+                overTime: overTime,
+                leaveTime: timeLeaving,
+                lastestWork: latestWork,
+                annualLeave: getAnnualLeave,
+                month: month,
+                salary: salary,
+                fomula: fomula,
+                pageTitle: 'MH-3',
+                path: '/MH-3'
+            });
         });
-    });
 
 }
 
+//Render trang Covid(MH-4)
 exports.getCovid = (req, res, next) => {
     res.render('MH-4/main', {
         pageTitle: 'Covid',

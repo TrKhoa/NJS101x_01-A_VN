@@ -1,5 +1,6 @@
 const path = require('path');
 
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -12,8 +13,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-//const adminRoutes = require('./routes/admin');
-//const shopRoutes = require('./routes/shop');
+//Khai báo Route
 const modifyRoutes = require('./routes/modify');
 const showRoutes = require('./routes/show');
 
@@ -22,8 +22,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Lưu trữ user vào Req
 app.use((req, res, next) => {
-    User.findById('630136dd5b35345c44aa8a53')
+    User.findById('63022a7544f3880c50a11db1')
         .then(user => {
             req.user = user;
             const time = new Date();
@@ -39,13 +40,12 @@ app.use((req, res, next) => {
         .catch(err => console.log(err));
 });
 
-//app.use('/admin', adminRoutes);
-//app.use(shopRoutes);
+//Sử dụng Route
 app.use(modifyRoutes);
 app.use(showRoutes);
-
 app.use(errorController.get404);
 
+//Triển khai kết nối với MongoDb thông qua mongoose
 mongoose
     .connect(
         'mongodb+srv://khoa:khoa@cluster1.fixlpkx.mongodb.net/asm?retryWrites=true&w=majority', {
@@ -54,6 +54,7 @@ mongoose
         }
     )
     .then(result => {
+        //Tạo Dummy User khi không có User
         User.findOne().then(user => {
             if (!user) {
                 const user = new User({

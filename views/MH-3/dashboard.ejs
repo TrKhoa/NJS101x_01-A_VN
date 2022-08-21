@@ -64,6 +64,7 @@
                         <div class="row mb-4">
                             <div class="col-12 col-md">
                                 <h3>Lương</h3>
+                                <p>Công thức tính : <% if(fomula) {%> <%= fomula %> <% } else {%>salaryScale * 3000000 + (overTime - số giờ làm thiếu) * 200000<% } %></p>
                                 <p>Lương tháng <%= month %> của bạn là: <%= salary %></p>
                                 <form action="/MH-3/salary" method="post">
                                     <input type="date" name="date" required>

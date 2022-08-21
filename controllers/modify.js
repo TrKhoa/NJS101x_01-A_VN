@@ -5,29 +5,10 @@ const TemperatureRegister = require('../models/temperatureregister');
 const VaccineRegister = require('../models/vaccineregister');
 const CovidReport = require('../models/covidreport');
 
+//Thêm các Functions tự viết
+const exFunc = require('../util/extraFunction');
+
 const alert = require('alert');
-
-function msToTime(time) {
-    var ms = time % 1000;
-    time = (time - ms) / 1000;
-    var secs = time % 60;
-    time = (time - secs) / 60;
-    var mins = time % 60;
-    var hrs = (time - mins) / 60;
-    return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
-}
-
-function dateFormat(date){
-    return date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()
-}
-
-function toMilis(time) {
-    return time * 60 * 60 * 1000;
-}
-
-function toHour(time) {
-    return (new Date(time)).getHours();
-}
 
 //Điếm dảnh và kết thúc ngày làm
 exports.getAttendance = (req, res, next) => {
@@ -238,38 +219,47 @@ exports.postSalary = (req, res, next) => {
         const getAttendance = values[2];
         const getAnnualLeave = values[3];
         const user = req.user;
+        //const noTime = exFunc.toUTC(new Date(0)).getTime();
         const dates = new Date(req.body.date);
         const thisMonth = new Date().getMonth() + 1;
         const thisYear = new Date().getFullYear();
         const month = dates.getMonth() + 1;
         const year = dates.getFullYear();
         const salaryScale = user.salaryScale;
-        const timePerDay = toMilis(8);
+        //const timePerDay = new Date(exFunc.toMilis(8) - exFunc.toMilis(7)).getTime();
         let totalWorkTime = 0;
         let totalAnnualTime = 0;
-        let overTime = 0;
+        let totalOverTime = 0;
         for (var i = 0; getUser.attendance[i]; i++) {
             const userData = getUser.attendance[i];
             const checkMonth = userData.date.getMonth() + 1;
             const checkYear = userData.date.getFullYear();
-            const workTime = userData.workTime.getTime();
+            const workTime = exFunc.msToHours(userData.workTime.getTime());
+            const timeRequiredPerDay = exFunc.toMilis(8);
+            const offTime = userData.timeLeaving;
             if (checkMonth == month && checkYear == thisYear) {
-                console.log("OKKKKKK");
+                totalWorkTime += workTime;
+                totalAnnualTime += offTime;
+                if ((workTime + offTime) > timeRequiredPerDay) {
+                    totalOverTime = workTime + offTime - timeRequiredPerDay;
+                }
             }
+
         }
         const basicIncome = 3000000;
         const extraCred = 200000;
-        const timeRequiredPerMonth = timePerDay * 30;
-        let missingTime = totalWorkTime - timeRequiredPerMonth;
+        const timeRequiredPerMonth = 8 * 30;
+        let missingTime = totalWorkTime + totalAnnualTime - timeRequiredPerMonth;
         if (missingTime <= 0) {
             missingTime = Math.abs(missingTime);
         } else {
             missingTime = 0;
         }
 
-        const salary = salaryScale * basicIncome + toHour(Math.abs(overTime - missingTime)) * extraCred;
-        const fomula = salaryScale + "*"+ basicIncome +"+"+ "Math.abs("+toHour(overTime) +"-"+ toHour(missingTime)+") *"+ extraCred;
-        console.log(fomula);
+        const salary = salaryScale * basicIncome + (totalOverTime - missingTime) * extraCred;
+        alert(totalWorkTime +"+"+ totalAnnualTime +"-"+ timeRequiredPerMonth);
+        const fomula = encodeURIComponent(salaryScale + ' * ' + basicIncome + ' + (' + totalOverTime + '-' + missingTime + ') *    ' + extraCred);
+        res.redirect('/MH-3?salary=' + salary + '&fomula=' + fomula)
     })
 
 }
