@@ -4,10 +4,14 @@
 <body>
     <%- include('../includes/navigation.ejs') %>
     <div class="container">
+
+        <!-- Hiên thông tin ngày nghỉ -->
         <div class="row centered">
             <h1>Nghỉ Phép</h1>
             <h4>Số ngày nghỉ còn lại: <%= remainDay %></h4>
         </div>
+
+        <!-- Form nhập thông tin -->
         <div class="row">
             <form class="col-md-4 m-3 mx-auto" action="/MH-1/annualLeave" method="post">
                 <div class="mb-3">
@@ -41,6 +45,7 @@
                 <button class="btn btn-outline-primary" type="submit">Xác nhận</button>
             </form>
         </div>
+
     </div>
 
     <%- include('../includes/end.ejs') %>

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+//tạo Schema
 const workSchema = new Schema({
     startAt: {
       type: Date,

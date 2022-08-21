@@ -1,3 +1,4 @@
+//Thêm các Schema
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
@@ -10,6 +11,7 @@ const currDate = new Date(new Date().toDateString()); //Khai báo ngày hiện t
 //Render trang index(MH-1)
 exports.getIndex = (req, res, next) => {
     res.render('MH-1/index', {
+        name: req.user.name,
         working: req.user.status,
         pageTitle: 'MH-1',
         path: '/MH-1'
@@ -161,6 +163,7 @@ exports.getDashboard = (req, res, next) => {
                 overTime = workTime - exFunc.toMilis(8);
             }
             const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
+            //render
             res.render('MH-3/dashboard', {
                 user: getUser,
                 work: getWork,

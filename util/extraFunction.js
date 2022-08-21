@@ -9,6 +9,7 @@ exports.msToTime = time => {
     return hrs + ' giờ ' + mins + ' phút ' + secs + ' giây ';
 }
 
+//Convert milisecond sang giờ
 exports.msToHours = time => {
     var ms = time % 1000;
     time = (time - ms) / 1000;

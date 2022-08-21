@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+//tạo Schema
 const annualLeaveSchema = new Schema({
     date: {
         type:Date,

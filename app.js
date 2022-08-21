@@ -1,15 +1,16 @@
+//Thêm cái gói cần thiết
 const path = require('path');
-
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+//Thêm controller và model
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
 const app = express();
 
+//Khai báo dùng Ejs
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -17,6 +18,7 @@ app.set('views', 'views');
 const modifyRoutes = require('./routes/modify');
 const showRoutes = require('./routes/show');
 
+//Dùng bodyParser
 app.use(bodyParser.urlencoded({
     extended: false
 }));

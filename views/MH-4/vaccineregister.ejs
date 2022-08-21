@@ -5,6 +5,7 @@
     <%- include('../includes/navigation.ejs') %>
     <div class="container">
         <div class="row centered">
+            <!-- Hiển thị lỗi -->
             <% if(errMessage) { %>
             <div class="alert alert-danger">
                 <strong>Có lỗi!</strong> <%= errMessage %>
@@ -15,6 +16,8 @@
         <div class="row">
             <div class="card mt-5 col-md-8 p-md-5 offset-md-2">
                 <div class="row no-gutters">
+
+                    <!-- Hiển thị form nhập thông tin -->
                     <form action="/MH-4/vaccine-register" method="post">
                         <div class="row mb-4">
                             <h3>Thông tin mũi <%= vaccineCount+1 %>:</h3>

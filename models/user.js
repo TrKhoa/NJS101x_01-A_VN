@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 //Thêm các Functions tự viết
 const exFunc = require('../util/extraFunction');
 
+//tạo Schema
 const userSchema = new Schema({
     name: {
         type: String,
@@ -36,6 +37,7 @@ const userSchema = new Schema({
         type: Number,
         default: 0
     },
+    //Thêm các attendance
     attendance: [{
         date: {
             type: Date,
@@ -64,15 +66,19 @@ const userSchema = new Schema({
     },
 });
 
+//Tạo method thêm attendance vào user
 userSchema.methods.addToAttendance = function(work) {
+
+    //Khai báo biến
     const newWorkId = work._id;
     const newWorkTime = work.workTime.getTime();
     const currDate = new Date(new Date().toDateString());
     const attendance = this.attendance;
+
+    //Nếu đã tồn tại trong user
     if (attendance.length > 0) {
-
+        //Tạo index
         let dateIndex = -2;
-
         for (var i = 0; this.attendance[i]; i++) {
             if (this.attendance[i].date.getTime() == currDate.getTime()) {
                 dateIndex = i;
@@ -81,16 +87,20 @@ userSchema.methods.addToAttendance = function(work) {
                 dateIndex = -1;
             }
         }
+
+        //Update attendance đã có trong user nếu tìm dc index
         if (dateIndex != -1) {
+            //Khai báo biến
             const works = [...this.attendance[dateIndex].works];
             const lastTime = this.attendance[dateIndex].workTime.getTime();
             let workTime = lastTime;
             let annualLeave = [];
             let time = this.attendance[dateIndex].timeLeaving;
 
-            works.push(newWorkId);
-            workTime += newWorkTime;
+            works.push(newWorkId); //cập nhật work
+            workTime += newWorkTime; //Cập nhật workTime
 
+            //Cập nhật annualList
             AnnualLeave.find({
                     userId: this._id,
                 })
@@ -118,17 +128,22 @@ userSchema.methods.addToAttendance = function(work) {
                         workTime: workTime,
                     }
 
+                    //Cập nhật
                     this.attendance[dateIndex] = date;
                     this.save();
                 })
-        } else {
+        }
+        //Tạo mới attendance đã có trong user khi không tìm dc index
+        else {
+            //Khai báo biến
             let date = new Date();
             let workTime = new Date(work.workTime);
             let annualLeave = [];
             let time = 0;
 
+            //Thêm annualList
             AnnualLeave.find({
-                    userId: this._id,
+                    userId: this._id
                 })
                 .then((result) => {
                     for (var i = 0; result[i]; i++) {
@@ -140,6 +155,9 @@ userSchema.methods.addToAttendance = function(work) {
                             time += leaveTime;
                         }
                     }
+                    if (time > 8) {
+                        time = 8;
+                    }
                 })
                 .then(result => {
                     const addWork = {
@@ -149,16 +167,22 @@ userSchema.methods.addToAttendance = function(work) {
                         timeLeaving: time,
                         workTime: workTime
                     };
+
+                    //Cập nhật
                     this.attendance.push(addWork);
                     this.save();
                 })
         }
-    } else {
+    }
+    //Nếu chưa tồn tại trong user
+    else {
+        //Khai báo biến
         let date = new Date();
         let workTime = new Date(work.workTime);
         let annualLeave = [];
         let time = 0;
 
+        //Thêm annualList
         AnnualLeave.find({
                 userId: this._id
             })
@@ -172,6 +196,9 @@ userSchema.methods.addToAttendance = function(work) {
                         time += leaveTime;
                     }
                 }
+                if (time > 8) {
+                    time = 8;
+                }
             })
             .then(result => {
                 const addWork = {
@@ -181,6 +208,8 @@ userSchema.methods.addToAttendance = function(work) {
                     timeLeaving: time,
                     workTime: workTime
                 };
+
+                //Cập nhật
                 this.attendance = addWork;
                 this.save();
             })
