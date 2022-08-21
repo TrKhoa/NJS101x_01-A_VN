@@ -6,7 +6,7 @@ const AnnualLeave = require('../models/annualleave');
 //Thêm các Functions tự viết
 const exFunc = require('../util/extraFunction');
 
-const currDate = new Date(new Date().toDateString()); //Khai báo ngày hiện tại
+const currDate = new Date(); //Khai báo ngày hiện tại
 
 //Render trang index(MH-1)
 exports.getIndex = (req, res, next) => {
@@ -125,7 +125,7 @@ exports.getDashboard = (req, res, next) => {
         .then(data => {
             for (var i = 0; data.attendance[i]; i++) {
                 const time = data.attendance[i].date.getTime();
-                if (time == currDate.getTime()) {
+                if (time == exFunc.toUTC(currDate).getTime()) {
                     return data.attendance[i];
                     break;
                 }

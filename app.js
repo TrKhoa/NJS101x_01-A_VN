@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Lưu trữ user vào Req
 app.use((req, res, next) => {
-    User.findById('63022cfb29174216eca750b8')
+    User.findById('00000516ee536302b0e78445')
         .then(user => {
             req.user = user;
             const time = new Date();

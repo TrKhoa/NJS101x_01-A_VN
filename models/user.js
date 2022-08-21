@@ -69,6 +69,60 @@ const userSchema = new Schema({
 //Tạo method thêm attendance vào user
 userSchema.methods.addToAttendance = function(work) {
 
+    //Tạo obj lưu trữ
+    function Store(currDate, works, annualList, timeLeaving, workTime) {
+        return {
+            date: currDate,
+            works: works,
+            annualList: annualList,
+            timeLeaving: timeLeaving,
+            workTime: workTime,
+        }
+    }
+
+    //Hàm lấy time và annualLeave
+    function getTimeAndAnnualLeave(data, currDate, time) {
+
+        //Khai báo biến
+        const annualLeave = [];
+        const checkDateList = [];
+        const lastUpdateTime = [];
+
+        //Nếu tìm dc data thì tiến hành cập nhật lại ngày nghỉ
+        for (var i = 0; data[i]; i++) {
+            const checkDate = exFunc.toUTC(data[i].date).getTime();
+            if (checkDate == currDate.getTime()) {
+                const leaveId = data[i]._id;
+                const leaveTime = data[i].time;
+                const idxCheckDate = checkDateList.indexOf(checkDate);
+                annualLeave.push(leaveId);
+
+                //Nếu ngày này chưa thêm số số giờ nghỉ thì kiểm tra xem số giờ nghỉ cần thêm có lớn hơn giờ nghỉ tối đa của 1 ngày và cập nhật
+                if (idxCheckDate == -1 && leaveTime <= 8 && time < 8) {
+                    time += leaveTime;
+                    checkDateList.push(checkDate);
+                    lastUpdateTime.push(leaveTime);
+                }
+
+                //Nếu đã thêm ngày thì kiểm tra giá trị lần cuối của time và cập nhật
+                else {
+                    if (lastUpdateTime[idxCheckDate] < 8) {
+                        const newTime = Math.abs(leaveTime - lastUpdateTime[idxCheckDate])
+                        time += newTime;
+                        lastUpdateTime[idxCheckDate] = time;
+                    }
+                }
+            }
+        }
+
+        //Kết quả trả về dạng obj
+        const returnData = {
+            annualLeave: annualLeave,
+            time: time
+        }
+        return returnData;
+    }
+
     //Khai báo biến
     const newWorkId = work._id;
     const newWorkTime = work.workTime.getTime();
@@ -77,7 +131,8 @@ userSchema.methods.addToAttendance = function(work) {
 
     //Nếu đã tồn tại trong user
     if (attendance.length > 0) {
-        //Tạo index
+
+        //Lấy index
         let dateIndex = -2;
         for (var i = 0; this.attendance[i]; i++) {
             if (this.attendance[i].date.getTime() == currDate.getTime()) {
@@ -90,6 +145,7 @@ userSchema.methods.addToAttendance = function(work) {
 
         //Update attendance đã có trong user nếu tìm dc index
         if (dateIndex != -1) {
+
             //Khai báo biến
             const works = [...this.attendance[dateIndex].works];
             const lastTime = this.attendance[dateIndex].workTime.getTime();
@@ -105,31 +161,13 @@ userSchema.methods.addToAttendance = function(work) {
                     userId: this._id,
                 })
                 .then((result) => {
-                    for (var i = 0; result[i]; i++) {
-                        const checkDate = exFunc.toUTC(result[i].date).getTime();
-                        if (checkDate == currDate.getTime()) {
-                            const leaveId = result[i]._id;
-                            const leaveTime = result[i].time;
-                            annualLeave.push(leaveId);
-                            time += leaveTime;
-                        }
-                    }
-                    if (time > 8) {
-                        time = 8;
-                    }
-
+                    return getTimeAndAnnualLeave(result, currDate, time);
                 })
-                .then(() => {
-                    const date = {
-                        date: currDate,
-                        works: works,
-                        annualList: annualLeave,
-                        timeLeaving: time,
-                        workTime: workTime,
-                    }
+                .then(result => {
+                    const updatedValue = new Store(currDate, works, result.annualLeave, result.time, workTime);
 
                     //Cập nhật
-                    this.attendance[dateIndex] = date;
+                    this.attendance[dateIndex] = updatedValue;
                     this.save();
                 })
         }
@@ -146,30 +184,13 @@ userSchema.methods.addToAttendance = function(work) {
                     userId: this._id
                 })
                 .then((result) => {
-                    for (var i = 0; result[i]; i++) {
-                        const checkDate = exFunc.toUTC(result[i].date).getTime();
-                        if (checkDate == currDate.getTime()) {
-                            const leaveId = result[i]._id;
-                            const leaveTime = result[i].time;
-                            annualLeave.push(leaveId);
-                            time += leaveTime;
-                        }
-                    }
-                    if (time > 8) {
-                        time = 8;
-                    }
+                    return getTimeAndAnnualLeave(result, currDate, time);
                 })
                 .then(result => {
-                    const addWork = {
-                        date: currDate,
-                        works: newWorkId,
-                        annualList: annualLeave,
-                        timeLeaving: time,
-                        workTime: workTime
-                    };
+                    const Work = new Store(currDate, newWorkId, result.annualLeave, result.time, workTime);
 
                     //Cập nhật
-                    this.attendance.push(addWork);
+                    this.attendance.push(Work);
                     this.save();
                 })
         }
@@ -187,30 +208,13 @@ userSchema.methods.addToAttendance = function(work) {
                 userId: this._id
             })
             .then((result) => {
-                for (var i = 0; result[i]; i++) {
-                    const checkDate = exFunc.toUTC(result[i].date).getTime();
-                    if (checkDate == currDate.getTime()) {
-                        const leaveId = result[i]._id;
-                        const leaveTime = result[i].time;
-                        annualLeave.push(leaveId);
-                        time += leaveTime;
-                    }
-                }
-                if (time > 8) {
-                    time = 8;
-                }
+                return getTimeAndAnnualLeave(result, currDate, time);
             })
             .then(result => {
-                const addWork = {
-                    date: currDate,
-                    works: newWorkId,
-                    annualList: annualLeave,
-                    timeLeaving: time,
-                    workTime: workTime
-                };
+                const Work = new Store(currDate, newWorkId, result.annualLeave, result.time, workTime);
 
-                //Cập nhật
-                this.attendance = addWork;
+                //Thêm
+                this.attendance = Work;
                 this.save();
             })
     }
