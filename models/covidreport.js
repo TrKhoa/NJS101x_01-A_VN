@@ -26,7 +26,7 @@ const covidReportSchema = new Schema({
         type: Boolean,
         default: 0
     },
-    datePrc:{
+    datePcr:{
         type: Date
     },
     userId: {

@@ -176,7 +176,7 @@ exports.postAnnualLeave = (req, res, next) => {
 
 //thực hiện thay đổi hình ảnh
 exports.postProfile = (req, res, next) => {
-    const imageUrl = req.body.imageUrl;//Lấy url imageUrl
+    const imageUrl = req.body.imageUrl; //Lấy url imageUrl
     //Lưu Url image
     User
         .findById(req.user)
@@ -413,16 +413,15 @@ exports.postCovidReport = (req, res, next) => {
     if (address != '') {
         let month = '';
         let dateTest = '';
-        let datepcr = '';
+        let datePcr = '';
 
         //Kiểm tra data từ checkbox
-        if (wasF0)
+        if (wasF0 == 1)
             month = req.body.month;
-        if (quickTest)
+        if (quickTest == 1)
             dateTest = req.body.dateTest;
-        if (pcr)
-            datepcr = req.body.datepcr;
-
+        if (pcr == 1)
+            datePcr = req.body.datePcr;
         //Lưu thông tin
         const covidReport = new CovidReport({
             address: address,
@@ -431,7 +430,7 @@ exports.postCovidReport = (req, res, next) => {
             quickTest: quickTest,
             dateTest: dateTest,
             pcr: pcr,
-            datepcr: datepcr,
+            datePcr: datePcr,
             userId: userId
         })
         covidReport
