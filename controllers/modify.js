@@ -29,13 +29,15 @@ exports.getAttendance = (req, res, next) => {
                 userId: req.user
             })
             .sort({
-                startAt: -1
+                startAt: -1 //Sắp xếp theo desc
             })
             .then(work => {
+                //Khai bao biến
                 const time = new Date();
                 const workTime = time - work.startAt;
                 work.endAt = time;
                 work.workTime = workTime;
+                //lưu thông tin làm việc
                 work.save()
                     .then(work => {
                         const userId = req.user;
@@ -63,6 +65,7 @@ exports.getAttendance = (req, res, next) => {
 
 //Thực hiện thêm điểm danh
 exports.postAttendance = (req, res, next) => {
+    //Trả về trạng thái chưa điểm danh
     if (!req.user.status) {
         const time = new Date();
         const location = req.body.location;
@@ -91,13 +94,15 @@ exports.postAttendance = (req, res, next) => {
                     .catch(err => console.log(err));
             })
             .catch(err => console.log(err));
-    } else
+    }
+    //Trả về trạng thái đã điểm danh
+    else
         return res.redirect('/');
 }
 
 //render trang AnnualLeave
 exports.getAnnualLeave = (req, res, next) => {
-    const remainDay = req.user.annualLeave;
+    const remainDay = req.user.annualLeave; //Số ngày nghỉ còn lại
     res.render('MH-1/annualLeave', {
         pageTitle: 'MH-1',
         remainDay: remainDay,
@@ -171,7 +176,8 @@ exports.postAnnualLeave = (req, res, next) => {
 
 //thực hiện thay đổi hình ảnh
 exports.postProfile = (req, res, next) => {
-    const imageUrl = req.body.imageUrl;
+    const imageUrl = req.body.imageUrl;//Lấy url imageUrl
+    //Lưu Url image
     User
         .findById(req.user)
         .then(user => {
@@ -188,12 +194,16 @@ exports.postProfile = (req, res, next) => {
 //Thực hiện tính toán salary
 exports.postSalary = (req, res, next) => {
     const currDate = new Date(new Date().toDateString());
+
+    //Tìm ngày nghỉ
     const annualLeave = AnnualLeave.find({
         userId: req.user
     });
 
+    //Tìm user
     const user = User.findById(req.user);
 
+    //Tìm Work
     const work = Work.find({
             userId: req.user
         })
@@ -202,6 +212,7 @@ exports.postSalary = (req, res, next) => {
         })
         .catch(err => console.log(err));
 
+    //tìm attendance
     const attendance = User
         .findById(req.user)
         .populate('attendance.works')
@@ -270,7 +281,9 @@ exports.postSalary = (req, res, next) => {
             //Tính tiền lương và hiển thị công thức tính
             const salary = salaryScale * basicIncome + (totalOverTime - missingTime) * extraCred;
             const fomula = encodeURIComponent(salaryScale + ' * ' + basicIncome + ' + (' + totalOverTime + ' - ' + missingTime + ') *    ' + extraCred);
-            if(salary>0){
+
+            //Trả về data nếu như lương không âm
+            if (salary > 0) {
                 res.redirect('/MH-3?salary=' + salary + '&fomula=' + fomula);
             } else {
                 res.redirect('/MH-3?salary=' + 0 + '&fomula=' + fomula);
