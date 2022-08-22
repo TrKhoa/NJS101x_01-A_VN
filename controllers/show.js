@@ -20,93 +20,34 @@ exports.getIndex = (req, res, next) => {
 
 //Render trang history(MH-1)
 exports.getTodayHistory = (req, res, next) => {
-    /*
+
     User
         .findById(req.user)
-        .populate('attendance.works', {startAt: exFunc.toUTC(currDate)}).sort( {starAt:-1})
+        .populate('attendance.works')
         .then(data=>{
             return data.attendance;
         })
-        .find({startAt: {$gte: exFunc.toUTC(currDate)}})
         .then(data => {
-            console.log(data);
-            res.render('MH-1/history', {
-                user: req.user.name,
-                data: getWork,
-                date: exFunc.dateFormat(currDate),
-                workTime: exFunc.msToTime(workTime),
-                pageTitle: 'MH-1',
-                path: '/MH-1'
-            });
-        })
-        */
+            let history = [];
 
-    //Lấy data từ collection AnnualLeave
-    const annualLeave = AnnualLeave.find({
-        userId: req.user
-    });
-
-    //Lấy data từ collection User
-    const user = User.findById(req.user);
-
-    //Lấy data từ collection work
-    const work = Work.find({
-            userId: req.user,
-            startAt: {
-                $gte: exFunc.toUTC(currDate)
-            }
-        })
-        .sort({
-            startAt: -1, //Xếp theo thứ tự Desc
-        })
-        .then(data => {
-            return data;
-        })
-        .catch(err => console.log(err));
-
-    //Lấy data Attendance từ collection User
-    const attendance = User
-        .findById(req.user)
-        .populate('attendance.works')
-        .then(data => {
-            for (var i = 0; data.attendance[i]; i++) {
-                const time = data.attendance[i].date.getTime();
-                if (time == currDate.getTime()) {
-                    return data.attendance[i];
+            for(var i=0; data[i]; i++){
+                if(data[i].date.toDateString() == currDate.toDateString()){
+                    history = data[i];
                     break;
                 }
             }
-        })
 
-    User
-        .findById(req.user)
-        .populate('attendance.works', {startAt: exFunc.toUTC(currDate)}).sort( {starAt:-1})
-        .then(data => {
             console.log(data);
-        })
-
-    //Lấy data từ các Promise cần dùng cho vào 1 mảng
-    Promise.all([work, attendance])
-        //Truyển mảng vừa mới nhận được sau khi có đủ data
-        .then((values) => {
-            //Đặt tên cho các phần tử của mảng
-            const getWork = values[0];
-            const getAttendance = values[1];;
-            //Khai báo biến
-            let workTime = 0;
-            const latestWork = getWork[0];
-            //Nếu có data từ attendance thì gán data
-            if (getAttendance)
-                workTime = getAttendance.workTime.getTime();
-            //render
             res.render('MH-1/history', {
                 user: req.user.name,
-                data: getWork,
+                data: history.works.sort().reverse(),
                 date: exFunc.dateFormat(currDate),
-                workTime: exFunc.msToTime(workTime),
+                workTime: exFunc.msToTime(history.workTime.getTime()),
                 pageTitle: 'MH-1',
                 path: '/MH-1'
             });
+
+
         })
 }
 

@@ -22,7 +22,7 @@ exports.msToHours = time => {
 
 //Hiển thị theo format ngày/tháng/năm
 exports.dateFormat = date => {
-    return date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
+    return date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
 }
 
 //Convert sang giờ
