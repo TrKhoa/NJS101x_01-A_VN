@@ -110,11 +110,13 @@ exports.getDashboard = (req, res, next) => {
     Promise.all([user, work, attendance, annualLeave])
         //Truyển mảng vừa mới nhận được sau khi có đủ data
         .then((values) => {
+
             //Đặt tên cho các phần tử của mảng
             const getUser = values[0]
             const getWork = values[1];
             const getAttendance = values[2];
             const getAnnualLeave = values[3];
+
             //Khai báo biến
             const month = req.query.month;
             const salary = req.query.salary;
@@ -123,20 +125,24 @@ exports.getDashboard = (req, res, next) => {
             let timeLeaving = 0;
             let overTime = 0;
             const latestWork = getWork[0];
+
             //Nếu có data từ attendance thì gán data
             if (getAttendance) {
                 workTime = getAttendance.workTime.getTime();
                 timeLeaving = getAttendance.timeLeaving;
             }
+
             //Nếu hôm nay có xin nghỉ
             if (timeLeaving > 0) {
                 workTime += exFunc.toMilis(timeLeaving);
             }
+
             //Tính giờ làm thêm nếu có
             if (workTime > exFunc.toMilis(8)) {
                 overTime = workTime - exFunc.toMilis(8);
             }
             const shownDate = currDate.getDate() + "/" + (currDate.getMonth() + 1) + "/" + currDate.getFullYear();
+
             //render
             res.render('MH-3/dashboard', {
                 user: getUser,

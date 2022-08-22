@@ -219,6 +219,7 @@ exports.postSalary = (req, res, next) => {
             const getWork = values[1];
             const getAttendance = values[2];
             const getAnnualLeave = values[3];
+
             //Khai báo biến
             const user = req.user;
             const salaryScale = user.salaryScale;
@@ -233,6 +234,7 @@ exports.postSalary = (req, res, next) => {
             let totalWorkTime = 0;
             let totalAnnualTime = 0;
             let totalOverTime = 0;
+
             //Tính tổng giờ làm, ngày nghỉ, giờ làm thêm của tháng
             for (var i = 0; getUser.attendance[i]; i++) {
 
@@ -268,7 +270,11 @@ exports.postSalary = (req, res, next) => {
             //Tính tiền lương và hiển thị công thức tính
             const salary = salaryScale * basicIncome + (totalOverTime - missingTime) * extraCred;
             const fomula = encodeURIComponent(salaryScale + ' * ' + basicIncome + ' + (' + totalOverTime + ' - ' + missingTime + ') *    ' + extraCred);
-            res.redirect('/MH-3?salary=' + salary + '&fomula=' + fomula)
+            if(salary>0){
+                res.redirect('/MH-3?salary=' + salary + '&fomula=' + fomula);
+            } else {
+                res.redirect('/MH-3?salary=' + 0 + '&fomula=' + fomula);
+            }
         })
 
 }
