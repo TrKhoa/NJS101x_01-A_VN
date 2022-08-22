@@ -20,6 +20,26 @@ exports.getIndex = (req, res, next) => {
 
 //Render trang history(MH-1)
 exports.getTodayHistory = (req, res, next) => {
+    /*
+    User
+        .findById(req.user)
+        .populate('attendance.works', {startAt: exFunc.toUTC(currDate)}).sort( {starAt:-1})
+        .then(data=>{
+            return data.attendance;
+        })
+        .find({startAt: {$gte: exFunc.toUTC(currDate)}})
+        .then(data => {
+            console.log(data);
+            res.render('MH-1/history', {
+                user: req.user.name,
+                data: getWork,
+                date: exFunc.dateFormat(currDate),
+                workTime: exFunc.msToTime(workTime),
+                pageTitle: 'MH-1',
+                path: '/MH-1'
+            });
+        })
+        */
 
     //Lấy data từ collection AnnualLeave
     const annualLeave = AnnualLeave.find({
@@ -31,10 +51,13 @@ exports.getTodayHistory = (req, res, next) => {
 
     //Lấy data từ collection work
     const work = Work.find({
-            userId: req.user
+            userId: req.user,
+            startAt: {
+                $gte: exFunc.toUTC(currDate)
+            }
         })
         .sort({
-            startAt: -1 //Xếp theo thứ tự Desc
+            startAt: -1, //Xếp theo thứ tự Desc
         })
         .then(data => {
             return data;
@@ -53,6 +76,13 @@ exports.getTodayHistory = (req, res, next) => {
                     break;
                 }
             }
+        })
+
+    User
+        .findById(req.user)
+        .populate('attendance.works', {startAt: exFunc.toUTC(currDate)}).sort( {starAt:-1})
+        .then(data => {
+            console.log(data);
         })
 
     //Lấy data từ các Promise cần dùng cho vào 1 mảng
