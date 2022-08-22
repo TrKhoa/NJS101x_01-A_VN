@@ -21,28 +21,31 @@ exports.getIndex = (req, res, next) => {
 //Render trang history(MH-1)
 exports.getTodayHistory = (req, res, next) => {
 
+    //Lấy danh sách works
     User
         .findById(req.user)
-        .populate('attendance.works')
-        .then(data=>{
+        .populate('attendance.works') //liên kết
+        .then(data => {
             return data.attendance;
         })
         .then(data => {
-            let history = [];
-
-            for(var i=0; data[i]; i++){
-                if(data[i].date.toDateString() == currDate.toDateString()){
-                    history = data[i];
+            let history;
+            let workTime;
+            //Tìm history theo ngày
+            for (var i = 0; data[i]; i++) {
+                if (data[i].date.toDateString() == currDate.toDateString()) {
+                    history = data[i].works.sort().reverse();
+                    workTime = exFunc.msToTime(data[i].workTime.getTime())
                     break;
                 }
             }
 
-            console.log(data);
+            //render
             res.render('MH-1/history', {
                 user: req.user.name,
-                data: history.works.sort().reverse(),
+                data: history,//Sắp xếp trả theo giờ làm gần nhất
                 date: exFunc.dateFormat(currDate),
-                workTime: exFunc.msToTime(history.workTime.getTime()),
+                workTime: workTime,
                 pageTitle: 'MH-1',
                 path: '/MH-1'
             });

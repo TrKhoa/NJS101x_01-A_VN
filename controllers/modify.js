@@ -188,7 +188,6 @@ exports.postProfile = (req, res, next) => {
 //Thực hiện tính toán salary
 exports.postSalary = (req, res, next) => {
     const currDate = new Date(new Date().toDateString());
-
     const annualLeave = AnnualLeave.find({
         userId: req.user
     });

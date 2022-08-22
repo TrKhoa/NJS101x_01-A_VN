@@ -39,4 +39,4 @@ exports.toUTC = date => {
 exports.toMilis = time => {
     return time * 60 * 60 * 1000;
 }
-//For debug: new Date(new Date(new Date(new Date(new Date().setDate(3)).setMonth(5)).setHours(20)).toDateString())
+//For debug: new Date(new Date(new Date(new Date().setDate(5)).setMonth(5)).setHours(23))

@@ -48,7 +48,7 @@ function toHour(time) {
             </div>
             <div class="col-md-6">
                 <!-- Hiện số giờ làm -->
-                <h3 class="centered">Hôm nay đã làm được: <%= workTime %> phút</h3>
+                <h3 class="centered">Hôm nay đã làm được:<br><%= workTime %> phút</h3>
             </div>
         </div>
 
@@ -56,7 +56,7 @@ function toHour(time) {
             <ol class="list-group list-group-numbered">
 
                 <!--Hiện danh sách đã làm trong ngày -->
-                <% data.forEach(val=> { %>
+                <% if(data) {data.forEach(val=> { %>
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
                         <div class="fw-bold">Ngày: <%= dateFormat(val.startAt) %></div>
@@ -66,7 +66,7 @@ function toHour(time) {
                         Làm việc trong: <%if(val.workTime) {%><%= msToTime(val.workTime.getTime()) %><%} else {%> -- <% } %>
                     </div>
                 </li>
-                <% }) %>
+                <% })} %>
 
             </ol>
         </div>

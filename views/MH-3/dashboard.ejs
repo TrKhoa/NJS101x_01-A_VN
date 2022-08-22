@@ -39,7 +39,7 @@
                         <!-- Hiển thị thông tin ngày nghỉ -->
                         <div class="col-12 col-md">
                             <h3>Danh sách ngày nghỉ:</h3>
-                            <% if(annualLeave && leaveTime){
+                            <% if(annualLeave){
                                     annualLeave.forEach(data => {%>
                             Ngày: <%= data.date.getDate()+"/"+(data.date.getMonth()+1)+"/"+data.date.getFullYear() %>
                             - Nghỉ trong: <%= data.time %> giờ <br>
@@ -85,7 +85,7 @@
                         <div class="row">
                             <h3>Lịch sử làm việc</h3>
                             <ol class="list-group list-group-numbered">
-                                
+
                                 <!-- Hiển thị lịch sử làm việc -->
                                 <% work.forEach(val=> { %>
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
