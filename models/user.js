@@ -35,6 +35,10 @@ const userSchema = new Schema({
         type: Number,
         required: true
     },
+    position: {
+        type: Number,
+        required: true
+    },
     annualLeave: {
         type: Number
     },

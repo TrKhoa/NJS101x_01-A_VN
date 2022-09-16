@@ -86,17 +86,30 @@ mongoose
         //Tạo Dummy User khi không có User
         User.findOne().then(user => {
             if (!user) {
-                const user = new User({
-                    username: 'khoa',
-                    password: 'khoa',
-                    name: 'Khoa',
+                const employee = new User({
+                    username: 'khoa2',
+                    password: 'khoa2',
+                    name: 'Khoa Employee',
                     dob: '2003-02-13',
                     startDate: '2015-03-25',
                     department: 1,
+                    position: 1,
                     annualLeave: 5,
                     imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
                 });
-                user.save();
+                const manager = new User({
+                    username: 'khoa1',
+                    password: 'khoa1',
+                    name: 'Khoa Manager',
+                    dob: '2002-01-12',
+                    startDate: '2014-02-24',
+                    department: 1,
+                    position: 2,
+                    annualLeave: 5,
+                    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
+                });
+                employee.save();
+                manager.save();
             }
         });
         app.listen(3000);
