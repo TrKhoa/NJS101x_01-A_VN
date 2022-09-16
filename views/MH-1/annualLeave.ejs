@@ -1,4 +1,5 @@
 <%- include('../includes/head.ejs') %>
+<script src="https://cdn.alloyui.com/3.0.1/aui/aui-min.js"></script>
 </head>
 
 <body>
@@ -14,6 +15,15 @@
         <!-- Form nhập thông tin -->
         <div class="row">
             <form class="col-md-4 m-3 mx-auto" action="/MH-1/annualLeave" method="post">
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Ngày nghỉ</label>
+                    <textarea class="form-control date-picker" type="text" placeholder="mm/dd/yy" name="offDay" readonly></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Số giờ nghỉ:</label>
+                    <input type="number" min=0 max=8 class="form-control input" name="offTime" placeholder="Giờ" required>
+                </div>
+                <!--
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label">Ngày nghỉ</label>
                     <input type="date" class="form-control input" name="offDay1" required>
@@ -38,6 +48,7 @@
                     <label for="exampleFormControlInput1" class="form-label">Số giờ nghỉ:</label>
                     <input type="number" min=0 max=8 class="form-control input" name="offTime3" placeholder="Giờ">
                 </div>
+                -->
                 <div class="mb-3">
                     <label for="exampleFormControlTextarea1" class="form-label">Lý do</label>
                     <textarea class="form-control" name="reason" rows="3" required></textarea>
@@ -47,5 +58,24 @@
         </div>
 
     </div>
+
+    <script type="text/javascript">
+        YUI().use(
+            'aui-datepicker',
+            function(Y) {
+                new Y.DatePicker({
+                    trigger: '.date-picker',
+                    mask: '%m/%d/%y',
+                    calendar: {
+                        selectionMode: 'multiple'
+                    },
+                    popover: {
+                        zIndex: 1
+                    },
+                    panes: 2
+                });
+            }
+        );
+    </script>
 
     <%- include('../includes/end.ejs') %>

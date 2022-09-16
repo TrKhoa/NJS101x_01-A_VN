@@ -132,10 +132,12 @@ exports.getDashboard = (req, res, next) => {
                 timeLeaving = getAttendance.timeLeaving;
             }
 
+            /* Nếu muốn cộng thêm thời gian nghỉ
             //Nếu hôm nay có xin nghỉ
             if (timeLeaving > 0) {
                 workTime += exFunc.toMilis(timeLeaving);
             }
+            */
 
             //Tính giờ làm thêm nếu có
             if (workTime > exFunc.toMilis(8)) {

@@ -117,12 +117,12 @@ exports.postAnnualLeave = (req, res, next) => {
     let Days = 0;
     const userId = req.user;
     const remainDay = req.user.annualLeave;
-    const offDay1 = req.body.offDay1;
-    const offDay2 = req.body.offDay2;
-    const offDay3 = req.body.offDay3;
-    const offTime1 = req.body.offTime1;
-    const offTime2 = req.body.offTime2;
-    const offTime3 = req.body.offTime3;
+    const offDay = req.body.offDay.split(' — ');
+    //const offDay2 = req.body.offDay2;
+    //const offDay3 = req.body.offDay3;
+    const offTime = req.body.offTime;
+    //const offTime2 = req.body.offTime2;
+    //const offTime3 = req.body.offTime3;
     const reason = req.body.reason;
 
     //Tính số ngày
@@ -156,21 +156,21 @@ exports.postAnnualLeave = (req, res, next) => {
     //Tạo hàm vào database
     function addAnnualLeaveToDB(offDay, offTime, reason, userId) {
         if (offDay) {
-            Days += timeEqualDay(offTime); //Tính số ngày
+            offDay.forEach(date=>{
+                Days += timeEqualDay(offTime); //Tính số ngày
 
-            //Thêm ngày khi vẫn còn ngày nghỉ
-            if (remainDay - Days >= 0)
-                addAnnualLeave(offDay, offTime, reason, userId);
-            else {
-                alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
-            }
+                //Thêm ngày khi vẫn còn ngày nghỉ
+                if (remainDay - Days >= 0)
+                    addAnnualLeave(new Date(date), offTime, reason, userId);
+                else {
+                    alert("Xin nghỉ phép thất bại do hết thời gian nghỉ phép")
+                }
+            })
         }
     }
 
     //Thêm thông tin
-    addAnnualLeaveToDB(offDay1, offTime1, reason, userId);
-    addAnnualLeaveToDB(offDay2, offTime2, reason, userId);
-    addAnnualLeaveToDB(offDay3, offTime3, reason, userId);
+    addAnnualLeaveToDB(offDay, offTime, reason, userId);
     res.redirect('/');
 }
 

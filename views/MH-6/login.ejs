@@ -1,0 +1,39 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <% if (errorMessage) { %>
+        <div class="alert alert-danger">
+            <strong>Có lỗi!</strong> <%= errorMessage %>
+        </div>
+        <% } %>
+    <div class="container">
+        <div class="row centered">
+            <h1>Đăng nhập</h1>
+        </div>
+        <div class="row">
+            <div class="card mt-5 col-md-6 p-md-5 offset-md-3">
+                <div class="row no-gutters">
+                    <form action="/MH-6/login" method="post">
+                        <div class="row">
+                            <div class="form-outline">
+                                <label class="form-label" for="username">Username</label>
+                                <input type="text" id="username" name="username" class="form-control" value="<%= oldInput.username %>" required />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-outline mb-4">
+                                <label class="form-label" for="password">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mb-4">Đăng nhập</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../includes/end.ejs') %>

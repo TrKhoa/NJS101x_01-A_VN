@@ -3,18 +3,31 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const session = require('express-session');
+var flash = require('connect-flash');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 //Thêm controller và model
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
+const MONGODB_URI =
+  'mongodb+srv://khoa:khoa@cluster1.fixlpkx.mongodb.net/asm?retryWrites=true&w=majority';
+
 const app = express();
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: 'sessions'
+});
+
+app.use(flash());
 
 //Khai báo dùng Ejs
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 //Khai báo Route
+const authRoutes = require('./routes/auth');
 const modifyRoutes = require('./routes/modify');
 const showRoutes = require('./routes/show');
 
@@ -23,26 +36,40 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+  session({
+    secret: 'my secret',
+    resave: false,
+    saveUninitialized: false,
+    store: store
+  })
+);
 
 //Lưu trữ user vào Req
 app.use((req, res, next) => {
-    User.findById('00000516ee536302b0e78445')
-        .then(user => {
-            req.user = user;
-            const time = new Date();
-            const firstDate = 1;
-            const firstMonth = 0;
-            if(time.getDate() == firstDate && time.getMonth() == firstMonth){
-                req.user.annualLeave = 5;
-                user.save();
-            }
-            next();
-        })
-
-        .catch(err => console.log(err));
+    if (req.session.user) {
+        User.findById(req.session.user._id)
+            .then(user => {
+                req.user = user;
+                req.isLoggedIn = 1;
+                const time = new Date();
+                const firstDate = 1;
+                const firstMonth = 0;
+                if (time.getDate() == firstDate && time.getMonth() == firstMonth) {
+                    req.user.annualLeave = 5;
+                    user.save();
+                }
+                next();
+            })
+            .catch(err => console.log(err));
+    } else {
+        req.isLoggedIn = 0;
+        next();
+    }
 });
 
 //Sử dụng Route
+app.use(authRoutes);
 app.use(modifyRoutes);
 app.use(showRoutes);
 app.use(errorController.get404);
@@ -50,7 +77,7 @@ app.use(errorController.get404);
 //Triển khai kết nối với MongoDb thông qua mongoose
 mongoose
     .connect(
-        'mongodb+srv://khoa:khoa@cluster1.fixlpkx.mongodb.net/asm?retryWrites=true&w=majority', {
+        MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         }
@@ -60,6 +87,8 @@ mongoose
         User.findOne().then(user => {
             if (!user) {
                 const user = new User({
+                    username: 'khoa',
+                    password: 'khoa',
                     name: 'Khoa',
                     dob: '2003-02-13',
                     startDate: '2015-03-25',
