@@ -17,6 +17,57 @@
                 <button class="btn btn-lg btn-primary col-12" type="submit" name="annualLeave">Đăng ký thông tin dương tính với covid</button>
             </a>
         </div>
-        
+        <div class="row centered">
+            <h1>Thông tin Covid của người dùng</h1>
+        </div>
+        <div class="row">
+            <div class="card mt-5 col-md-10 p-md-5 offset-md-1">
+                <div class="row no-gutters">
+                    <% if(userData.temperature) {%>
+                        <div class="col-md-4 m-3 mx-auto">
+                            <h3>Thân nhiệt</h3>
+                            <p>Nhiệt độ: <%= userData.temperature %>C</p>
+                            <p>Ngày đo: <%= moment(userData.temperatureDate).locale('vn').format("DD/MM/YYYY"); %></p>
+                        </div>
+                    <% } %>
+                    <% if(userData.vaccine) {%>
+                        <div class="col-md-4 m-3 mx-auto">
+                            <h3>Vaccine</h3>
+                            <p>Số mũi Vaccine đã tiêm: <%= userData.vaccineCount %> mũi</p>
+                            <p>Tên Vaccine: <%
+                                switch(userData.vaccine[userData.vaccine.length-1].vaccineType)
+                                {
+                                    case 1:
+                                    %> Astrazeneca <%;
+                                    break;
+                                    case 2:
+                                    %> Pfizer <%;
+                                }
+
+                            %></p>
+                            <p>Địa chỉ tiêm: <%= userData.vaccine[userData.vaccine.length-1].vaccineLocation %></p>
+                            <p>Ngày tiêm: <%= moment(userData.vaccine[userData.vaccine.length-1].vaccineDate).locale('vn').format("DD/MM/YYYY"); %></p>
+                        </div>
+                    <% } %>
+                    <% if(userData.quarantineAddress) {%>
+                        <div class="col-md-4 m-3 mx-auto">
+                            <h3>Tình trạng cách ly</h3>
+                            <p>Địa chỉ cách ly: <%= userData.quarantineAddress %></p>
+                            <% if(userData.wasF0){ %>
+                            <p>Số tháng từng là F0: <%= userData.monthF0 %> tháng</p>
+                            <% } %>
+                            <% if(userData.quickTest){ %>
+                            <p>Ngày test nhanh dương tính: <%= moment(userData.dateTest).locale('vn').format("DD/MM/YYYY"); %></p>
+                            <% } %>
+                            <% if(userData.pcr){ %>
+                            <p>Ngày RT-PCR dương tính: <%= moment(userData.datePcr).locale('vn').format("DD/MM/YYYY"); %></p>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
     </div>
+    <script src="/js/moment.min.js"></script>
     <%- include('../includes/end.ejs') %>

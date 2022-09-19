@@ -4,7 +4,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
-var flash = require('connect-flash');
+const flash = require('connect-flash');
+const multer = require('multer');
+const moment = require('moment');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 //Thêm controller và model
@@ -15,12 +17,32 @@ const MONGODB_URI =
   'mongodb+srv://khoa:khoa@cluster1.fixlpkx.mongodb.net/asm?retryWrites=true&w=majority';
 
 const app = express();
+app.locals.moment = moment;
 const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions'
 });
 
-app.use(flash());
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().getTime()+'-'+file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 //Khai báo dùng Ejs
 app.set('view engine', 'ejs');
@@ -32,10 +54,12 @@ const modifyRoutes = require('./routes/modify');
 const showRoutes = require('./routes/show');
 
 //Dùng bodyParser
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(flash());
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/MH-2/images',express.static(path.join(__dirname, 'images')));
 app.use(
   session({
     secret: 'my secret',
@@ -94,6 +118,7 @@ mongoose
                     startDate: '2015-03-25',
                     department: 1,
                     position: 1,
+                    vaccine:[],
                     annualLeave: 5,
                     imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
                 });
@@ -105,6 +130,7 @@ mongoose
                     startDate: '2014-02-24',
                     department: 1,
                     position: 2,
+                    vaccine:[],
                     annualLeave: 5,
                     imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
                 });

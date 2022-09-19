@@ -3,6 +3,11 @@
 
 <body>
     <%- include('../includes/navigation.ejs') %>
+    <% if (errorMessage) { %>
+        <div class="alert alert-danger">
+            <strong>Có lỗi!</strong> <%= errorMessage %>
+        </div>
+        <% } %>
     <div class="container">
         <div class="row centered">
             <h1>Thông tin người dùng</h1>
@@ -14,7 +19,7 @@
                         <img src="<%= user.imageUrl %>" class="card-img" alt="ảnh đại diện">
                     </div>
                     <div class="col-md-6">
-                        <!-- Hiểnthị data -->
+                        <!-- Hiển thị data -->
                         <div class="card-body">
                             <h5 class="card-title"><h2><%= user.name %></h2></h5>
                             <p class="card-text">Ngày sinh: <%= user.dob.getDate()+"/"+user.dob.getMonth()+"/"+user.dob.getFullYear() %></p>
@@ -25,9 +30,9 @@
 
                             <!-- Thay đổi hình ảnh -->
                             <% if(edit){%>
-                            <form class="" action="/MH-2/profile" method="POST">
-                                <label for="imageUrl">Đường dẫn hình ảnh:</label>
-                                <input type="text" class="form-control input" name="imageUrl" required>
+                            <form class="" action="/MH-2/profile" method="POST" enctype="multipart/form-data">
+                                <label for="image">Đường dẫn hình ảnh:</label>
+                                <input type="file" id="image" class="form-control input" name="image">
                             <% } %>
                             <% if(!edit){%>
                                 <a href="/MH-2/profile?edit=true">
@@ -38,7 +43,7 @@
                             <% if(!edit){ %>
                                 </a>
                             <% } %>
-                            
+
                             </form>
 
                         </div>

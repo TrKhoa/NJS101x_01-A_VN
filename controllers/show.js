@@ -2,6 +2,9 @@
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
+const TemperatureRegister = require('../models/temperatureregister');
+const VaccineRegister = require('../models/vaccineregister');
+const CovidReport = require('../models/covidreport');
 
 //Thêm các Functions tự viết
 const exFunc = require('../util/extraFunction');
@@ -64,6 +67,7 @@ exports.getProfile = (req, res, next) => {
             res.render('MH-2/profile', {
                 user: user,
                 edit: editMode,
+                errorMessage: null,
                 pageTitle: 'Profile',
                 path: '/MH-2'
             });
@@ -168,6 +172,7 @@ exports.getDashboard = (req, res, next) => {
 //Render trang Covid(MH-4)
 exports.getCovid = (req, res, next) => {
     res.render('MH-4/main', {
+        userData: req.user,
         pageTitle: 'Covid',
         path: '/MH-4'
     })

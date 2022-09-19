@@ -176,19 +176,31 @@ exports.postAnnualLeave = (req, res, next) => {
 
 //thực hiện thay đổi hình ảnh
 exports.postProfile = (req, res, next) => {
-    const imageUrl = req.body.imageUrl; //Lấy url imageUrl
+    const img = req.file;
     //Lưu Url image
-    User
-        .findById(req.user)
-        .then(user => {
-            user.imageUrl = imageUrl;
-            user.save();
-        })
-        .then(result => {
-            console.log("Thay đổi ảnh thành công");
-            return res.redirect('/MH-2/profile');
-        })
-        .catch(err => console.log(err));
+    if(!img)
+    {
+        res.render('MH-2/profile', {
+            user: req.user,
+            edit: true,
+            errorMessage: "Định dạng hình ảnh không hợp lệ",
+            pageTitle: 'Profile',
+            path: '/MH-2'
+        });
+    }
+    else
+    {
+        User
+            .findById(req.user)
+            .then(user => {
+                user.imageUrl = img.path;
+                user.save();
+            })
+            .then(result => {
+                return res.redirect('profile');
+            })
+            .catch(err => console.log(err));
+    }
 }
 
 //Thực hiện tính toán salary
@@ -304,29 +316,20 @@ exports.getTemperatureResgister = (req, res, next) => {
 exports.postTemperatureResgister = (req, res, next) => {
 
     //Khai báo biến
-    const hasTravel = req.body.hasTravel;
-    const country = req.body.country;
-    const hasContact = req.body.hasContact;
-    const hasSymptoms = req.body.hasSymptoms;
-    const describe = req.body.describe;
+    const temperatureDate = req.body.temperatureDate;
     const temperature = req.body.temperature;
     const userId = req.user;
 
     //Lưu data
-    const temperatureRegister = new TemperatureRegister({
-        hasTravel: hasTravel,
-        country: country,
-        hasContact: hasContact,
-        hasSymptoms: hasSymptoms,
-        describe: describe,
-        temperature: temperature,
-        userId: userId
-    })
-    temperatureRegister
-        .save()
+    const temperatureRegister = {
+        temperatureDate: temperatureDate,
+        temperature: temperature
+    }
+    User.findById(userId)
+        .update(temperatureRegister)
         .then(result => {
             console.log("Khai báo thân nhiệt thành công");
-            res.redirect("/");
+            res.redirect("/MH-4");
         })
         .catch(err => console.log(err));
 }
@@ -359,33 +362,28 @@ exports.postVaccineRegister = (req, res, next) => {
     const location2 = req.body.location2;
     const userId = req.user;
 
-    //tạo hàm thêm thông tin vaccine
-    function addVaccine(vaccineType, vaccineId, date, location, userId) {
-        const vaccine = new VaccineRegister({
+    function Store(vaccineType, vaccineId, vaccineDate, vaccineLocation) {
+        return {
             vaccineType: vaccineType,
             vaccineId: vaccineId,
-            date: date,
-            location: location,
-            userId: userId
-        });
-        vaccine
-            .save()
-            .catch(err => console.log(err));
+            vaccineDate: vaccineDate,
+            vaccineLocation: vaccineLocation
+        }
     }
 
-    //Nếu data ko lỗi thì thêm Vaccine
-    if (vaccineType1 != 0 && vaccineId1 !== '' && date1 != '' && location1 != '') {
-        addVaccine(vaccineType1, vaccineId1, date1, location1, userId);
-        if (vaccineType2 != 0 && vaccineId2 !== '' && date2 != '' && location2 != '') {
-            addVaccine(vaccineType2, vaccineId2, date2, location2, userId);
+    User.findById(userId).then(result => {
+        if(vaccineType1 != 0 && vaccineId1 !== '' && date1 != '' && location1 != '')
+        {
+            const vaccineData = [...result.vaccine,Store(vaccineType1,vaccineId1,date1,location1 )];
+            result.updateOne({vaccine:vaccineData, vaccineCount: result.vaccineCount+1}).then(result=>{console.log("Them thanh cong")});
+                if(vaccineType2 != 0 && vaccineId2 !== '' && date2 != '' && location2 != '')
+                {
+                    const vaccineData2 = [...vaccineData,Store(vaccineType2,vaccineId2,date2,location2 )];
+                    result.updateOne({vaccine:vaccineData2, vaccineCount: result.vaccineCount+2}).then(result=>{console.log("Them thanh cong")});
+                }
         }
-        res.redirect('/');
-    }
-    //Nếu lỗi thì trả về báo lỗi
-    else {
-        var string = encodeURIComponent('Nhập thiếu thông tin');
-        res.redirect('/MH-4/vaccine-register?errMessage=' + string);
-    }
+    });
+    return res.redirect("/MH-4");
 }
 
 //render trang CovidReport
@@ -423,20 +421,18 @@ exports.postCovidReport = (req, res, next) => {
         if (pcr == 1)
             datePcr = req.body.datePcr;
         //Lưu thông tin
-        const covidReport = new CovidReport({
-            address: address,
+        const covidReport = {
+            quarantineAddress: address,
             wasF0: wasF0,
-            month: month,
+            monthF0: month,
             quickTest: quickTest,
             dateTest: dateTest,
             pcr: pcr,
-            datePcr: datePcr,
-            userId: userId
-        })
-        covidReport
-            .save()
+            datePcr: datePcr
+        };
+        User.findById(userId).updateOne(covidReport)
             .then(result => {
-                res.redirect('/');
+                res.redirect('/MH-4');
             })
             .catch(err => console.log(err));
     }

@@ -11,45 +11,12 @@
             <div class="card mt-5 col-md-8 p-md-5 offset-md-2 ">
                 <!-- Hiển thị form nhập thong tin -->
                 <form action="/MH-4/temperature-register" method="post">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" name="hasTravel" value=1>
-                                <label class="custom-control-label" for="hasTravel">Bạn đã đi du lịch hoăc̣ lưu trú trong những ngày qua?</label>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <label class="input-group-text" for="country">Quốc gia đã đi du lịch(Nếu có)</label>
-                                </div>
-                                <select class="custom-select form-control" id="country" name="country">
-                                    <option selected>...Chọn quốc gia</option>
-                                    <option value="Vietnam">Vietnam</option>
-                                    <option value="America">America</option>
-                                    <option value="France">France</option>
-                                </select>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" name="hasContact" value=1>
-                                <label class="custom-control-label" for="hasContact">Bạn đã tiếp xúc với người được xác nhận dương tính hoặc được xem xét trong 14 ngày qua?</label>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <!-- Default checked -->
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" name="hasSymptoms" value=1>
-                                <label class="custom-control-label" for="hasSymptoms">Bạn có bị cúm như các triệu chứng, triệu chứng hô hấp hoặc các vấn đề về hô hấp?</label>
-                            </div>
-                        </li>
                         <li class="list-group-item">
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">Miêu tả chi tiết(Nếu có)</span>
+                                    <span class="input-group-text">Ngày đo:</span>
                                 </div>
-                                <input type="text" aria-label="country" class="form-control" name="describe">
+                                <input type="date" aria-label="country" class="form-control" name="temperatureDate" required>
                             </div>
                         </li>
                         <li class="list-group-item">
@@ -57,11 +24,10 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Nhiệt độ</span>
                                 </div>
-                                <input type="number" aria-label="country" class="form-control" name="temperature" value=36>
+                                <input type="number" aria-label="country" class="form-control" name="temperature" value=36 min=20 max=50 value=36>
                                 <span class="input-group-text">độ C</span>
                             </div>
                         </li>
-                    </ul>
                     <button type="submit" class="btn btn-primary btn-block mb-4">Xác nhận</button>
                 </form>
             </div>

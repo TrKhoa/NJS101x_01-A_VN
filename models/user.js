@@ -39,15 +39,68 @@ const userSchema = new Schema({
         type: Number,
         required: true
     },
+    manager: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     annualLeave: {
         type: Number
     },
     imageUrl: {
         type: String
     },
+    temperature: {
+        type: Number
+    },
+    temperatureDate: {
+        type: Date
+    },
+    vaccine: [{
+        vaccineType: {
+            type: Number,
+            required: true
+        },
+        vaccineId: {
+            type: String,
+            required: true
+        },
+        vaccineDate: {
+            type: Date,
+            required: true
+        },
+        vaccineLocation: {
+            type: String,
+            required: true
+        }
+    }],
     vaccineCount: {
         type: Number,
         default: 0
+    },
+    quarantineAddress:{
+        type: String,
+        required: true
+    },
+    wasF0:{
+        type: Boolean,
+        default: 0
+    },
+    monthF0:{
+        type: Number
+    },
+    quickTest:{
+        type: Boolean,
+        default: 1
+    },
+    dateTest:{
+        type: Date
+    },
+    pcr:{
+        type: Boolean,
+        default: 0
+    },
+    datePcr:{
+        type: Date
     },
     //Thêm các attendance
     attendance: [{
