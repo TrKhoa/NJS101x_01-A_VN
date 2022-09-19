@@ -2,9 +2,12 @@
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
+/*
 const TemperatureRegister = require('../models/temperatureregister');
 const VaccineRegister = require('../models/vaccineregister');
 const CovidReport = require('../models/covidreport');
+*/
+const Pdf = require('pdfkit');
 
 //Thêm các Functions tự viết
 const exFunc = require('../util/extraFunction');
@@ -399,7 +402,6 @@ exports.getCovidReport = (req, res, next) => {
 
 //Thực hiện thêm data vào covidReport
 exports.postCovidReport = (req, res, next) => {
-
     //Khai báo biến
     const address = req.body.address;
     const wasF0 = req.body.wasF0;
@@ -441,5 +443,8 @@ exports.postCovidReport = (req, res, next) => {
         var string = encodeURIComponent('Nhập thiếu thông tin');
         res.redirect('/MH-4/covid-report?errMessage=' + string);
     }
+}
 
+exports.getPdf = (req,res,next) => {
+    
 }

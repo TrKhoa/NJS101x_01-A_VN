@@ -35,14 +35,14 @@ const userSchema = new Schema({
         type: Number,
         required: true
     },
-    position: {
+    roll : {
         type: Number,
         required: true
     },
-    manager: {
+    managerOf: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    },
+    }],
     annualLeave: {
         type: Number
     },
@@ -78,8 +78,7 @@ const userSchema = new Schema({
         default: 0
     },
     quarantineAddress:{
-        type: String,
-        required: true
+        type: String
     },
     wasF0:{
         type: Boolean,

@@ -117,25 +117,28 @@ mongoose
                     dob: '2003-02-13',
                     startDate: '2015-03-25',
                     department: 1,
-                    position: 1,
+                    roll : 1,
                     vaccine:[],
                     annualLeave: 5,
                     imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
                 });
-                const manager = new User({
-                    username: 'khoa1',
-                    password: 'khoa1',
-                    name: 'Khoa Manager',
-                    dob: '2002-01-12',
-                    startDate: '2014-02-24',
-                    department: 1,
-                    position: 2,
-                    vaccine:[],
-                    annualLeave: 5,
-                    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
-                });
-                employee.save();
-                manager.save();
+                employee.save().then(employee=>
+                    {
+                        const manager = new User({
+                            username: 'khoa1',
+                            password: 'khoa1',
+                            name: 'Khoa Manager',
+                            dob: '2002-01-12',
+                            startDate: '2014-02-24',
+                            department: 1,
+                            roll : 2,
+                            managerOf:[employee._id],
+                            vaccine:[],
+                            annualLeave: 5,
+                            imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
+                        });
+                        manager.save();
+                    });
             }
         });
         app.listen(3000);

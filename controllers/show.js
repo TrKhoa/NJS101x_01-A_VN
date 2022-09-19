@@ -171,9 +171,25 @@ exports.getDashboard = (req, res, next) => {
 
 //Render trang Covid(MH-4)
 exports.getCovid = (req, res, next) => {
-    res.render('MH-4/main', {
-        userData: req.user,
-        pageTitle: 'Covid',
-        path: '/MH-4'
-    })
+    const userId = req.user;
+    if(req.user.roll <2)
+    {
+        res.render('MH-4/main', {
+            userData: userId,
+            pageTitle: 'Covid',
+            path: '/MH-4'
+        });
+    } else {
+        User.findById(userId).populate('managerOf').then(result=>
+        {
+            const userList = result.managerOf;
+            res.render('MH-4/main', {
+                userData: userId,
+                userList: userList,
+                pageTitle: 'Covid',
+                path: '/MH-4'
+            });
+        });
+    }
+
 }
