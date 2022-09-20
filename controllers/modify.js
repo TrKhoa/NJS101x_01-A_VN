@@ -1,4 +1,8 @@
 //Then6m các Schema
+const fs = require('fs');
+const path = require('path');
+const pdfKit = require('pdfkit');
+const moment = require('moment');
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
@@ -446,5 +450,68 @@ exports.postCovidReport = (req, res, next) => {
 }
 
 exports.getPdf = (req,res,next) => {
-    
+    const userId = req.params.userId;
+    if(req.user.roll >1)
+    {
+        User.findById(req.user._id).then(result=>{
+            const employee = result.managerOf;
+            employee.forEach(e=>{
+                if(e==userId){
+                    const pdfName = "covid-"+userId+".pdf";
+                    const pdfPath = path.join('covid',pdfName);
+                    const pdf = new pdfKit();
+                    res.setHeader('Content-Type', 'application/pdf');
+                    res.setHeader('Content-Disposition','attachment; filename="'+pdfName+'"');
+                    pdf.pipe(fs.createWriteStream(pdfPath));
+                    pdf.pipe(res);
+                    User.findById(userId).then(result => {
+                        pdf.fontSize('22').text('Ten nhan vien: ' + result.name);
+                        const abc = moment(result.temperatureDate).locale('vn').format("DD/MM/YYYY");
+                        if(result.temperature)
+                        {
+
+                            pdf.fontSize('16').text('Than nhiet: ' + result.temperature);
+                            pdf.fontSize('16').text('Ngay do: ' + '3/5/2000');
+                        }
+                        if(result.vaccine.length>0)
+                        {
+                            const vaccine = result.vaccine;
+                            function vaccineName(vaccineType) {
+                                switch(vaccineType)
+                                {
+                                    case 1:
+                                        return "Astrazeneca";
+                                    case 2:
+                                        return "Pfizer";
+                                }
+                            }
+                            pdf.text('So mui da tiem: ' + result.vaccineCount);
+                            for(var i = 0; i< vaccine.length;i++)
+                            {
+                                pdf.fontSize('16').text('- Mui thu ' + (i+1) + ': ');
+                                pdf.fontSize('16').text('   + Ten Vaccine: ' + vaccineName(vaccine[i].vaccineType));
+                                pdf.fontSize('16').text('   + Dia chi tiem: ' + vaccine[i].vaccineLocation);
+                                pdf.fontSize('16').text('   + Ngay tiem: ' + moment(vaccine[i].vaccineDate).format("DD/MM/YYYY"));
+                            }
+                        }
+                        if(result.quarantineAddress)
+                        {
+                            pdf.fontSize('16').text('Dia chi cach ly: ' + result.quarantineAddress);
+                            if(result.wasF0)
+                                pdf.fontSize('16').text('So thang tung bi F0: ' + moment(result.monthF0).format("DD/MM/YYYY"));
+                            if(result.quickTest)
+                                pdf.fontSize('16').text('Ngay test nhanh duong tinh: ' + moment(result.dateTest).format("DD/MM/YYYY"));
+                            if(result.pcr)
+                                pdf.fontSize('16').text('Ngay RT-PCR duong tinh: ' + moment(result.datePcr).format("DD/MM/YYYY"));
+                        }
+                    }).then(result=>pdf.end());
+                }
+                else {
+                    return res.redirect('/MH-4');
+                }
+            })
+        })
+    } else {
+        res.redirect('/MH-4');
+    }
 }

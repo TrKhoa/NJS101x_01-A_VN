@@ -17,5 +17,6 @@ router.get('/MH-4/vaccine-register', isAuth, modifyController.getVaccineRegister
 router.post('/MH-4/vaccine-register', isAuth, modifyController.postVaccineRegister);
 router.get('/MH-4/covid-report', isAuth, modifyController.getCovidReport);
 router.post('/MH-4/covid-report', isAuth, modifyController.postCovidReport);
+router.get('/MH04/getPdf/:userId', isAuth, modifyController.getPdf);
 
 module.exports = router;
