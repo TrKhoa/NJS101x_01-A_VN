@@ -3,6 +3,11 @@
 
 <body>
     <%- include('../includes/navigation.ejs') %>
+    <% if (errorMessage) { %>
+        <div class="alert alert-danger">
+            <strong>Có lỗi!</strong> <%= errorMessage %>
+        </div>
+    <% } %>
     <div class="container">
 
         <div class="row">
@@ -15,7 +20,7 @@
         </div>
 
         <div class="row">
-            
+
             <!-- Nút bắt đầu/kết thúc làm -->
             <a class="col-md-4 m-3 mx-auto" href="/MH-1/attendance">
                 <button class="btn btn-lg btn-primary col-12" type="submit" name="Attendance">

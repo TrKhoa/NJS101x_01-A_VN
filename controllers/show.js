@@ -14,10 +14,17 @@ const currDate = new Date(); //Khai báo ngày hiện tại
 
 //Render trang index(MH-1)
 exports.getIndex = (req, res, next) => {
+    let errorMessage = req.flash('error');
+    if (errorMessage.length > 0) {
+        errorMessage = errorMessage[0];
+    } else {
+        errorMessage = null;
+    }
     res.render('MH-1/index', {
         name: req.user.name,
         working: req.user.status,
         pageTitle: 'MH-1',
+        errorMessage: errorMessage,
         userRoll: req.user.roll,
         path: '/MH-1'
     });
@@ -223,6 +230,8 @@ exports.getCovid = (req, res, next) => {
 
 exports.getEmployeeWork = (req, res, next) => {
     const userData = req.query.userData || null;
+    const month = req.query.month || 0;
+    console.log(month);
     const userId = req.user;
     User.findById(userId).populate('managerOf').populate('managerOf.attendance.works').then(result=>
     {
@@ -288,6 +297,7 @@ exports.getEmployeeWork = (req, res, next) => {
                         annualLeave: annualLeaves,
                         userList: userList,
                         date: new Date(),
+                        month: month,
                         overTime: overTime,
                         pageTitle: 'MH-5',
                         userRoll: req.user.roll,

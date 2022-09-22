@@ -559,9 +559,9 @@ exports.getHistoryDelete = (req,res,next) => {
     }
 }
 
-exports.getFrozen = (req,res,next) =>{
+exports.postFrozen = (req,res,next) =>{
     const userId = req.query.userId || null;
-    const month = +req.query.month || null;
+    const month = req.body.month || null;
     if(userId && month)
     {
         User.findById(userId).then(user => {
