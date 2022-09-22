@@ -26,6 +26,7 @@ exports.getAttendance = (req, res, next) => {
         return res.render('MH-1/attendance', {
             user: req.user.name,
             pageTitle: 'MH-1',
+            userRoll: req.user.roll,
             path: '/MH-1'
         });
     }
@@ -113,6 +114,7 @@ exports.getAnnualLeave = (req, res, next) => {
     res.render('MH-1/annualLeave', {
         pageTitle: 'MH-1',
         remainDay: remainDay,
+        userRoll: req.user.roll,
         path: '/MH-1'
     });
 }
@@ -192,6 +194,7 @@ exports.postProfile = (req, res, next) => {
             edit: true,
             errorMessage: "Định dạng hình ảnh không hợp lệ",
             pageTitle: 'Profile',
+            userRoll: req.user.roll,
             path: '/MH-2'
         });
     }
@@ -315,6 +318,7 @@ exports.postSalary = (req, res, next) => {
 exports.getTemperatureResgister = (req, res, next) => {
     res.render('MH-4/temperatureregister', {
         pageTitle: 'MH-4',
+        userRoll: req.user.roll,
         path: '/MH-4'
     });
 }
@@ -352,6 +356,7 @@ exports.getVaccineRegister = (req, res, next) => {
         vaccineCount: vaccineCount,
         errMessage: errMessage,
         pageTitle: 'MH-4',
+        userRoll: req.user.roll,
         path: '/MH-4'
     })
 }
@@ -400,6 +405,7 @@ exports.getCovidReport = (req, res, next) => {
         errMessage: errMessage,
         user: req.user,
         pageTitle: 'Đăng ký dương tính',
+        userRoll: req.user.roll,
         path: '/MH-4'
     })
 }
@@ -514,4 +520,86 @@ exports.getPdf = (req,res,next) => {
     } else {
         res.redirect('/MH-4');
     }
+}
+
+exports.getHistoryDelete = (req,res,next) => {
+    const userId = req.query.userData || null;
+    const userWorkId = req.query.del || null;
+    if(userWorkId)
+    {
+        const work = Work.findById(userWorkId);
+        const user = User.findById(userId);
+        Promise.all([user,work]).then(val => {
+            const userData = val[0];
+            const workData = val[1];
+            const attendance= userData.attendance;
+            for(var k = 0; k < attendance.length;k++)
+            {
+                 if(attendance[k].date.toDateString() == workData.startAt.toDateString())
+                 {
+                     const attendanceWorks = attendance[k].works;
+                     for(var i = 0;i<attendanceWorks.length;i++)
+                     {
+                         if(attendanceWorks[i]==userWorkId)
+                         {
+                             attendance[k].workTime = attendance[k].workTime - workData.workTime;
+                             attendanceWorks.splice(i,1);
+                             const filter = { _id: userId  };
+                             const update = { attendance:  attendance};
+                             User.findOneAndUpdate(filter,update).then(result => {
+                                 Work.deleteOne({ _id: userWorkId }).then(result => {
+                                     return res.redirect('/MH-5?userData='+userId);
+                                 })
+                             })
+                         }
+                     }
+                 }
+            }
+        })
+    }
+}
+
+exports.getFrozen = (req,res,next) =>{
+    const userId = req.query.userId || null;
+    const month = +req.query.month || null;
+    if(userId && month)
+    {
+        User.findById(userId).then(user => {
+            if(user != null)
+            {
+                const frozen = user.frozen;
+                const thisYear = new Date().getFullYear();
+                if(frozen.year == thisYear)
+                {
+                    const newMonth = [...frozen.month];
+                    if(newMonth.indexOf(month) == -1)
+                    {
+                        newMonth.push(month);
+                        const filter = { _id: userId };
+                        const update = { frozen: {month: newMonth, year: thisYear}};
+                        User.updateOne(filter,update).then(result => {
+                            return res.redirect('/MH-5?userData='+userId);
+                        })
+                    }
+                    else
+                    {
+                        return res.redirect('/MH-5?userData='+userId);
+                    }
+                }
+                else
+                {
+                    const filter = { _id: userId };
+                    const update = { month: [month], year: thisYear};
+                    User.updateOne(filter,update).then(result => {
+                        return res.redirect('/MH-5?userData='+userId);
+                    })
+                }
+            }
+            else
+            {
+                return res.redirect('/MH-5');
+            }
+        })
+    }
+
 }

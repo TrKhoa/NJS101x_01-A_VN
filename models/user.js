@@ -128,6 +128,14 @@ const userSchema = new Schema({
         type: Boolean,
         default: 0
     },
+    frozen: {
+        month: [{
+            type: Number
+        }],
+        year: {
+            type: Number
+        }
+    }
 });
 
 //Tạo method thêm attendance vào user
@@ -252,7 +260,6 @@ userSchema.methods.addToAttendance = function(work) {
                 })
                 .then(result => {
                     const Work = new Store(currDate, newWorkId, result.annualLeave, result.time, workTime);
-
                     //Cập nhật
                     this.attendance.push(Work);
                     this.save();

@@ -1,3 +1,4 @@
+<% if( userRoll >0 ) { %>
 <div class="backdrop"></div>
 <header class="main-header">
     <button id="side-menu-toggle">Menu</button>
@@ -15,6 +16,11 @@
             <li class="main-header__item">
                 <a class="<%= path === '/MH-4' ? 'active' : '' %>" href="/MH-4">MH-4</a>
             </li>
+            <% if(userRoll>1) { %>
+            <li class="main-header__item">
+                <a class="<%= path === '/MH-5' ? 'active' : '' %>" href="/MH-5">MH-5</a>
+            </li>
+            <% } %>
             <li class="main-header__item">
                 <a class="<%= path !== '/MH-6' ? '' : 'd-none' %>" href="/logout">Logout</a>
             </li>
@@ -36,5 +42,11 @@
                 <li class="mobile-nav__item">
                     <a class="<%= path === '/MH-4' ? 'active' : '' %>" href="/MH-4">MH-4</a>
                 </li>
+                <% if(userRoll>1) { %>
+                <li class="main-header__item">
+                    <a class="<%= path === '/MH-5' ? 'active' : '' %>" href="/MH-5">MH-5</a>
+                </li>
+                <% } %>
             </ul>
 </nav>
+<% } %>

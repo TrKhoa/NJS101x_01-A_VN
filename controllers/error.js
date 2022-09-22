@@ -1,4 +1,4 @@
 //Trả về trang báo lỗi
 exports.get404 = (req, res, next) => {
-  res.status(404).render('404', { pageTitle: 'Page Not Found', path: '/404' });
+  res.status(404).render('404', { pageTitle: 'Page Not Found', userRoll: req.user.roll,  path: '/404' });
 };

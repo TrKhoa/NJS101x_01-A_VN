@@ -120,7 +120,11 @@ mongoose
                     roll : 1,
                     vaccine:[],
                     annualLeave: 5,
-                    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
+                    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU",
+                    frozen: {
+                        month: [],
+                        year: new Date().getFullYear()
+                    }
                 });
                 employee.save().then(employee=>
                     {
@@ -135,7 +139,11 @@ mongoose
                             managerOf:[employee._id],
                             vaccine:[],
                             annualLeave: 5,
-                            imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU"
+                            imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPyGNr2qL63Sfugk2Z1-KBEwMGOfycBribew&usqp=CAU",
+                            frozen: {
+                                month: [],
+                                year: new Date().getFullYear()
+                            }
                         });
                         manager.save();
                     });

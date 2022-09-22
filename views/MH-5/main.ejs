@@ -1,0 +1,109 @@
+<%- include('../includes/head.ejs') %>
+<%
+    function workTimeShow(time) {
+        return time.getHours() - 7 + " Giờ " + time.getMinutes() + " Phút " + time.getSeconds() + " Giây";
+    }
+%>
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+    <div class="container">
+
+        <!-- Hiển thị các nút điều hướng -->
+        <% if(userData) { %>
+        <div class="row">
+            <div class="card mt-5 col-md-10 p-md-5 offset-md-1">
+                <div class="row centered">
+                    <h1>Nhân viên: <%= userData.name %></h1>
+                </div>
+                <div class="row no-gutters">
+                    <% if(userWork) {%>
+                    <div class="col-md-4 m-3 mx-auto">
+                        <h3>Ngày: <%= moment(date).format('DD/MM/YYYY') %></h3>
+                        <% if(annualLeave) { %>
+                            <p>Thời gian xin nghỉ: <%= annualLeave %> Giờ</p>
+                        <% } %>
+                        <% if(workTime) { %>
+                            <p>Hôm nay đã làm được: <%= workTime.getHours() - 7 + annualLeave + " Giờ " + workTime.getMinutes() + " Phút " + workTime.getSeconds() + " Giây " %></p>
+                        <% } else { %>
+                            <p>Hôm nay đã làm được: 0 Giờ</p>
+                        <% } %>
+                        <p>Số giờ làm thêm: <%= overTime %> Giờ</p>
+                    </div>
+                    <% } %>
+                </div>
+                <div class="row">
+                    <h3>Lịch sử làm việc</h3>
+                    <ol class="list-group list-group-numbered">
+                        <!-- Hiển thị lịch sử làm việc -->
+                        <% userWork.forEach(val=> { %>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Ngày: <%= val.startAt.getDate()+"/"+(val.startAt.getMonth()+1)+"/"+val.startAt.getFullYear() %></div>
+                                Nơi làm việc: <% if(val.location == 1) {%> Tại cơ quan <% } else { %> Tại nhà <% } %><br>
+                                Bắt đầu lúc: <%= val.startAt.getHours()+" giờ "+val.startAt.getMinutes()+" phút"%><br>
+                                Kết thúc lúc:
+                                <% if(!val.endAt)
+                                            {%> -- <%}
+                                        else
+                                            {%><%=val.endAt.getHours()+" giờ "+val.endAt.getMinutes()+" phút"%>
+                                <%}%>
+                                <br>
+                                Làm việc trong:
+                                    <% if(!val.endAt)
+                                        {%> -- <%}
+                                    else
+                                        {%><%=  workTimeShow(val.workTime) %>
+                                <%}%>
+                                </br>
+                                Số giờ làm thêm:
+                                    <% if(!val.endAt)
+                                        {%> -- <%}
+                                    else
+                                        {
+                                            const utc = 7;
+                                            const hourPerDay = 8;
+                                            if(val.workTime.getHours() - utc >8) { %>
+                                            <%=  val.workTime.getHours() - utc - 8 +" Giờ" %>
+                                        <% } else { %>
+                                            0 Giờ
+                                        <% }} %>
+                                </div>
+                                <% if(val.endAt) { %>
+                                    <a href="/MH-5/delete?userData=<%= userData._id %>&del=<%= val._id %>"><button class="btn btn-primary" type="button" name="button">Xóa</button></a>
+                                <% } %>
+                            </li>
+                        <% }) %>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <div class="row">
+            <div class="row">
+                <div class="card mt-5 col-md-10 p-md-5 offset-md-1">
+                    <div class="row centered">
+                        <h1>Danh sách nhân viên</h1>
+                    </div>
+                    <div class="row no-gutters">
+                        <% userList.forEach(val => { %>
+                            <a href="/MH-5?userData=<%= val._id %>">
+                                <div class="card col-md-4 m-3 mx-auto">
+                                    <img class="card-img-top" src="<%= val.imageUrl %>" alt="Card image cap">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><%= val.name %></h5>
+                                        <a href="/MH04/getPdf/<%= val._id %>" class="btn btn-primary">Tải PDF</a>
+                                    </div>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="/js/moment.min.js"></script>
+    <%- include('../includes/end.ejs') %>

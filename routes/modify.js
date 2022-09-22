@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const modifyController = require('../controllers/modify');
 const isAuth = require('../middleware/is-auth');
+const isManager = require('../middleware/is-manager');
 const router = express.Router();
 
 //Khai báo dường dẫn
@@ -18,5 +19,7 @@ router.post('/MH-4/vaccine-register', isAuth, modifyController.postVaccineRegist
 router.get('/MH-4/covid-report', isAuth, modifyController.getCovidReport);
 router.post('/MH-4/covid-report', isAuth, modifyController.postCovidReport);
 router.get('/MH04/getPdf/:userId', isAuth, modifyController.getPdf);
+router.get('/MH-5/delete', isAuth, isManager, modifyController.getHistoryDelete);
+router.get('/MH-5/frozen', isAuth, isManager, modifyController.getFrozen);
 
 module.exports = router;

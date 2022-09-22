@@ -73,7 +73,7 @@
                             <div class="col-12 col-md">
                                 <h3>Lương</h3>
                                 <p>Công thức tính : <% if(fomula) {%> <%= fomula %> <% } else {%>salaryScale * 3000000 + (overTime - số giờ làm thiếu) * 200000<% } %></p>
-                                <p>Lương tháng <%= month %> của bạn là: <%= salary %></p>
+                            <p>Lương tháng <%= month %> của bạn là: <%= salary %></p>
                             <form action="/MH-3/salary" method="post">
                                 <input type="date" name="date" required>
                                 <button type="submit" class="btn btn-secondary" name="confirm" id="confirm">Tính Lương</button>
@@ -81,12 +81,24 @@
                         </div>
                     </div>
 
-                    <d iv class="form-outline mb-4">
+                    <div class="form-outline mb-4">
                         <div class="row">
                             <h3>Lịch sử làm việc</h3>
                             <ol class="list-group list-group-numbered">
 
                                 <!-- Hiển thị lịch sử làm việc -->
+                                <nav>
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item mx-2">
+                                            <h4></h4>Chọn số dòng hiển thị </h4>
+                                        </li>
+                                        <li class="page-item"><a href="?page=1&itemPerPage=1" class="page-link">1</a></li>
+                                        <li class="page-item"><a href="?page=1&itemPerPage=2" class="page-link">2</a></li>
+                                        <li class="page-item"><a href="?page=1&itemPerPage=20" class="page-link">20</a></li>
+                                        <li class="page-item"><a href="?page=1&itemPerPage=30" class="page-link">30</a></li>
+                                        <li class="page-item"><a href="?page=1&itemPerPage=40" class="page-link">40</a></li>
+                                    </ul>
+                                </nav>
                                 <% work.forEach(val=> { %>
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div class="ms-2 me-auto">
@@ -108,13 +120,30 @@
                                         <%}%>
                                         </div>
                                     </li>
-                                    <% }) %>
+                                <% }) %>
+                                        <nav>
+                                            <ul class="pagination justify-content-center">
+                                                <% if (currentPage !== 1 && previousPage !== 1) { %>
+                                                <li class="page-item"><a href="?page=1&itemPerPage=<%= itemPerPage %>" class="page-link">1...</a></li>
+                                                <% } %>
+                                                <% if (hasPreviousPage) { %>
+                                                <li class="page-item"><a href="?page=<%= previousPage %>&itemPerPage=<%= itemPerPage %>" class="page-link "><%= previousPage %></a></li>
+                                                <% } %>
+                                                <li class="page-item disabled"><a href="?page=<%= currentPage %>&itemPerPage=<%= itemPerPage %>" class="page-link disabled"><%= currentPage %></a></li>
+                                                <% if (hasNextPage) { %>
+                                                <li class="page-item"><a href="?page=<%= nextPage %>&itemPerPage=<%= itemPerPage %>" class="page-link"><%= nextPage %></a></li>
+                                                <% } %>
+                                                <% if (lastPage !== currentPage && nextPage !== lastPage) { %>
+                                                <li class="page-item"><a href="?page=<%= lastPage %>&itemPerPage=<%= itemPerPage %>" class="page-link">...<%= lastPage %></a></li>
+                                                <% } %>
+                                            </ul>
+                                        </nav>
                             </ol>
                         </div>
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
-    </div>
     </div>
     <%- include('../includes/end.ejs') %>

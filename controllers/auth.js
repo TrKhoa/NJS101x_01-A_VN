@@ -5,6 +5,7 @@ exports.getLogin = (req, res, next) => {
     if (!req.session.isLoggedIn) {
         return res.render('MH-6/login', {
             pageTitle: 'Login',
+            userRoll: 0,
             path: '/MH-6',
             oldInput: {
                 username: ''
@@ -27,6 +28,7 @@ exports.postLogin = (req, res, next) => {
         {
             return res.status(422).render('MH-6/login', {
                 pageTitle: 'Login',
+                userRoll: 0,
                 path: '/MH-6',
                 oldInput: {
                     username: username
@@ -43,6 +45,7 @@ exports.postLogin = (req, res, next) => {
         }
         return res.status(422).render('MH-6/login', {
             pageTitle: 'Login',
+            userRoll: 0,
             path: '/MH-6',
             oldInput: {
                 username: username

@@ -1,4 +1,5 @@
 //Thêm các Schema
+const moment = require('moment');
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
@@ -17,6 +18,7 @@ exports.getIndex = (req, res, next) => {
         name: req.user.name,
         working: req.user.status,
         pageTitle: 'MH-1',
+        userRoll: req.user.roll,
         path: '/MH-1'
     });
 }
@@ -50,6 +52,7 @@ exports.getTodayHistory = (req, res, next) => {
                 date: exFunc.dateFormat(currDate),
                 workTime: workTime,
                 pageTitle: 'MH-1',
+                userRoll: req.user.roll,
                 path: '/MH-1'
             });
 
@@ -69,6 +72,7 @@ exports.getProfile = (req, res, next) => {
                 edit: editMode,
                 errorMessage: null,
                 pageTitle: 'Profile',
+                userRoll: req.user.roll,
                 path: '/MH-2'
             });
         })
@@ -78,6 +82,9 @@ exports.getProfile = (req, res, next) => {
 //Render trang Dashboard(MH-3)
 exports.getDashboard = (req, res, next) => {
 
+    const page = +req.query.page || 1;
+    const itemPerPage = +req.query.itemPerPage || 1;
+    let totalWorks = 0;
     //Lấy data từ collection AnnualLeave
     const annualLeave = AnnualLeave.find({
         userId: req.user
@@ -89,11 +96,21 @@ exports.getDashboard = (req, res, next) => {
     const work = Work.find({
             userId: req.user
         })
-        .sort({
-            startAt: -1 //Xếp theo thứ tự Desc
-        })
-        .then(data => {
-            return data;
+        .countDocuments()
+        .then(result => {
+            totalWorks = result;
+            return Work.find({
+                    userId: req.user
+                })
+                .sort({
+                    startAt: -1 //Xếp theo thứ tự Desc
+                })
+                .skip((page - 1) * itemPerPage)
+                .limit(itemPerPage)
+                .then(data => {
+                    return data;
+                })
+                .catch(err => console.log(err));
         })
         .catch(err => console.log(err));
     //Lấy data từ collection Attendance
@@ -153,6 +170,13 @@ exports.getDashboard = (req, res, next) => {
             res.render('MH-3/dashboard', {
                 user: getUser,
                 work: getWork,
+                itemPerPage: itemPerPage,
+                currentPage: page,
+                hasNextPage: itemPerPage * page < totalWorks,
+                hasPreviousPage: page > 1,
+                nextPage: page + 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(totalWorks / itemPerPage),
                 date: shownDate,
                 workTime: workTime,
                 overTime: overTime,
@@ -163,6 +187,7 @@ exports.getDashboard = (req, res, next) => {
                 salary: salary,
                 fomula: fomula,
                 pageTitle: 'MH-3',
+                userRoll: req.user.roll,
                 path: '/MH-3'
             });
         });
@@ -177,6 +202,7 @@ exports.getCovid = (req, res, next) => {
         res.render('MH-4/main', {
             userData: userId,
             pageTitle: 'Covid',
+            userRoll: req.user.roll,
             path: '/MH-4'
         });
     } else {
@@ -187,9 +213,98 @@ exports.getCovid = (req, res, next) => {
                 userData: userId,
                 userList: userList,
                 pageTitle: 'Covid',
+                userRoll: req.user.roll,
                 path: '/MH-4'
             });
         });
     }
 
+}
+
+exports.getEmployeeWork = (req, res, next) => {
+    const userData = req.query.userData || null;
+    const userId = req.user;
+    User.findById(userId).populate('managerOf').populate('managerOf.attendance.works').then(result=>
+    {
+        let isExist = 0;
+        const userList = result.managerOf;
+        for(var i = 0;i<userList.length;i++)
+        {
+            if(userList[i]._id==userData)
+            {
+                isExist = 1;
+                const attendance = userList[i].attendance;
+                if(userList[i].attendance[attendance.length-1]){
+                    const works = userList[i].attendance[attendance.length-1].works;
+                }
+                else {
+                    const works = null;
+                }
+                let overTime = 0;
+                const annualLeave = AnnualLeave.find({userId: userData}).then(result => {
+                    let time = 0;
+                    for(var i =0; i < result.length; i++)
+                    {
+                        const checkDate = moment(result[i].date).format('L');
+                        const today = moment().format('L');
+                        if(checkDate==today){
+                            time += result[i].time;
+                        }
+                    }
+                    if(time===0)
+                        return null;
+                    return time;
+                })
+                const work = Work.find({userId: userData}).sort({
+                    startAt: -1 //Xếp theo thứ tự Desc
+                });
+                Promise.all([userList[i],annualLeave,work,attendance]).then(val =>
+                {
+                    const userDatas = val[0];
+                    const annualLeaves = val[1];
+                    const works = val[2];
+                    const attendances = val[3][val[3].length-1];
+                    let overTime = 0;
+                    let lastWorkTime =  null;
+                    let workTime = null;
+                    let totalWorkTime = null;
+                    if(works.length>0){
+                        let lastWorkTime = works[0].workTime;
+                        let workTime = works[0].workTime;
+                        let workStart = works[0].startAt;
+                        let workEnd = works[0].workEnd;
+                    }
+                    if(val[3].length>0)
+                    {
+                        let totalWorkTime = attendances.workTime;
+                        if(moment(attendances.workTime).hour() - 7 > 8)
+                            overTime = moment(attendances.workTime).hour() - 15;
+                    }
+                    return res.render('MH-5/main', {
+                        userData: userDatas,
+                        userWork: works,
+                        lastWorkTime: lastWorkTime,
+                        workTime: totalWorkTime,
+                        annualLeave: annualLeaves,
+                        userList: userList,
+                        date: new Date(),
+                        overTime: overTime,
+                        pageTitle: 'MH-5',
+                        userRoll: req.user.roll,
+                        path: '/MH-5'
+                    });
+                })
+            }
+        }
+        if(isExist==0){
+            return res.render('MH-5/main', {
+                userData: userData,
+                userList: userList,
+                pageTitle: 'MH-5',
+                userRoll: req.user.roll,
+                path: '/MH-5'
+            });
+        }
+
+    });
 }
