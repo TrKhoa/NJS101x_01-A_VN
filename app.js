@@ -149,7 +149,9 @@ mongoose
                     });
             }
         });
-        app.listen(3000);
+        app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
+          console.log("Server is running.");
+        });
     })
     .catch(err => {
         console.log(err);
