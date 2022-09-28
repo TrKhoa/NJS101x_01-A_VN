@@ -103,7 +103,8 @@ mongoose
     .connect(
         MONGODB_URI, {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useFindAndModify: false
         }
     )
     .then(result => {
@@ -149,9 +150,7 @@ mongoose
                     });
             }
         });
-        app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
-          console.log("Server is running.");
-        });
+        app.listen(3000);
     })
     .catch(err => {
         console.log(err);

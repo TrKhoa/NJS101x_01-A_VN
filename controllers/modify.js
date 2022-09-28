@@ -604,7 +604,7 @@ exports.getPdf = (req,res,next) => {
                         {
                             pdf.fontSize('16').text('Dia chi cach ly: ' + result.quarantineAddress);
                             if(result.wasF0)
-                                pdf.fontSize('16').text('So thang tung bi F0: ' + moment(result.monthF0).format("DD/MM/YYYY"));
+                                pdf.fontSize('16').text('So thang tung bi F0: ' + result.monthF0);
                             if(result.quickTest)
                                 pdf.fontSize('16').text('Ngay test nhanh duong tinh: ' + moment(result.dateTest).format("DD/MM/YYYY"));
                             if(result.pcr)

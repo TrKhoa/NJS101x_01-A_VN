@@ -228,7 +228,6 @@ exports.getCovid = (req, res, next) => {
 exports.getEmployeeWork = (req, res, next) => {
     const userData = req.query.userData || null;
     const month = req.query.month || 0;
-    console.log(month);
     const userId = req.user;
     User.findById(userId).populate('managerOf').populate('managerOf.attendance.works').then(result=>
     {
