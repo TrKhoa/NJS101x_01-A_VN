@@ -3,14 +3,14 @@
 
 <body>
     <%- include('../includes/navigation.ejs') %>
+    <!-- Hiển thị lỗi -->
+    <% if(errMessage) { %>
+    <div class="alert alert-danger">
+        <strong>Có lỗi!</strong> <%= errMessage %>
+    </div>
+    <% } %>
     <div class="container">
         <div class="row centered">
-            <!-- Hiển thị lỗi -->
-            <% if(errMessage) { %>
-            <div class="alert alert-danger">
-                <strong>Có lỗi!</strong> <%= errMessage %>
-            </div>
-            <% } %>
             <h1>Đăng ký thông tin tiêm vaccine</h1>
         </div>
         <div class="row">
@@ -24,23 +24,23 @@
                             <div class="col">
                                 <div class="form-outline">
                                     <label class="form-label" for="vaccineType1">Loại Vaccine</label>
-                                    <select class="custom-select form-control" id="vaccineType1" name="vaccineType1" required>
-                                        <option value="0">Chọn Vaccine</option>
-                                        <option value="1">Astrazeneca</option>
-                                        <option value="2">Pfizer</option>
+                                    <select class="custom-select form-control" id="vaccineType1" name="vaccineType1" value="<%= oldData.vaccineType1 %>" required>
+                                        <option value="">Chọn Vaccine</option>
+                                        <option value="1" <% if(oldData.vaccineType1 == 1){%> selected <% } %>>Astrazeneca</option>
+                                        <option value="2" <% if(oldData.vaccineType1 == 2){%> selected <% } %>>Pfizer</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-outline">
                                     <label class="form-label" for="vaccineId1">Số lô</label>
-                                    <input type="text" id="vaccineId1" name="vaccineId1" class="form-control" placeholder="Số lô" required/>
+                                    <input type="text" id="vaccineId1" name="vaccineId1" class="form-control" value="<%= oldData.vaccineId1 %>" placeholder="Số lô" required/>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-outline">
                                     <label class="form-label" for="date1">Ngày tiêm</label>
-                                    <input type="date" id="date1" name="date1" class="form-control" required/>
+                                    <input type="date" id="date1" name="date1" class="form-control" value="<%= oldData.date1 %>" required/>
                                 </div>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                         <!-- Text input -->
                         <div class="form-outline mb-4">
                             <label class="form-label" for="location1">Nơi tiêm Vaccine</label>
-                            <input type="text" id="location1" name="location1" class="form-control" required/>
+                            <input type="text" id="location1" name="location1" class="form-control" value="<%= oldData.location1 %>" required/>
                         </div>
 
                         <div class="row mb-4">
@@ -58,21 +58,21 @@
                                     <label class="form-label" for="vaccineType2">Loại Vaccine</label>
                                     <select class="custom-select form-control" id="vaccineType2" name="vaccineType2">
                                         <option value="0">Chọn Vaccine</option>
-                                        <option value="1">Astrazeneca</option>
-                                        <option value="2">Pfizer</option>
+                                        <option value="1" <% if(oldData.vaccineType2 == 1){%> selected <% } %>>Astrazeneca</option>
+                                        <option value="2" <% if(oldData.vaccineType2 == 2){%> selected <% } %>>Pfizer</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-outline">
                                     <label class="form-label" for="vaccineId2">Số lô</label>
-                                    <input type="text" id="vaccineId2" name="vaccineId2" class="form-control" placeholder="Số lô" />
+                                    <input type="text" id="vaccineId2" name="vaccineId2" class="form-control" value="<%= oldData.vaccineId2 %>" placeholder="Số lô" />
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-outline">
                                     <label class="form-label" for="date2">Ngày tiêm</label>
-                                    <input type="date" id="date2" name="date2" class="form-control" />
+                                    <input type="date" id="date2" name="date2" class="form-control" value="<%= oldData.date2 %>" />
                                 </div>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                         <!-- Text input -->
                         <div class="form-outline mb-4">
                             <label class="form-label" for="location2">Nơi tiêm Vaccine</label>
-                            <input type="text" id="location2" name="location2" class="form-control" />
+                            <input type="text" id="location2" name="location2" class="form-control" value="<%= oldData.location2 %>" />
                         </div>
 
                         <!-- Submit button -->

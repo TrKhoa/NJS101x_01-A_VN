@@ -3,14 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const pdfKit = require('pdfkit');
 const moment = require('moment');
+const {validationResult} = require('express-validator/check');
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
-/*
-const TemperatureRegister = require('../models/temperatureregister');
-const VaccineRegister = require('../models/vaccineregister');
-const CovidReport = require('../models/covidreport');
-*/
 const Pdf = require('pdfkit');
 
 //Thêm các Functions tự viết
@@ -348,14 +344,23 @@ exports.postTemperatureResgister = (req, res, next) => {
 //render trang VaccineRegister
 exports.getVaccineRegister = (req, res, next) => {
     //Khai báo biến
-    let errMessage = req.query.errMessage; //Lấy thông tin lỗi
     const vaccineCount = req.user.vaccineCount;
 
     //render
     res.render('MH-4/vaccineregister', {
         vaccineCount: vaccineCount,
-        errMessage: errMessage,
+        errMessage: '',
         pageTitle: 'MH-4',
+        oldData: {
+            vaccineType1:'',
+            vaccineType2:'',
+            vaccineId1:'',
+            vaccineId2:'',
+            date1:'',
+            date2:'',
+            location1:'',
+            location2:''
+        },
         userRoll: req.user.roll,
         path: '/MH-4'
     })
@@ -373,6 +378,8 @@ exports.postVaccineRegister = (req, res, next) => {
     const location1 = req.body.location1;
     const location2 = req.body.location2;
     const userId = req.user;
+    const vaccineCount = req.user.vaccineCount;
+    const err = validationResult(req);
 
     function Store(vaccineType, vaccineId, vaccineDate, vaccineLocation) {
         return {
@@ -383,29 +390,68 @@ exports.postVaccineRegister = (req, res, next) => {
         }
     }
 
+    function vaccineRegister() {
+        return res.render('MH-4/vaccineregister', {
+            vaccineCount: vaccineCount,
+            errMessage: err.array()[0].msg,
+            pageTitle: 'MH-4',
+            oldData: {
+                vaccineType1: req.body.vaccineType1,
+                vaccineType2: req.body.vaccineType2,
+                vaccineId1: req.body.vaccineId1,
+                vaccineId2: req.body.vaccineId2,
+                date1: req.body.date1,
+                date2: req.body.date2,
+                location1: req.body.location1,
+                location2: req.body.location2,
+            },
+            userRoll: req.user.roll,
+            path: '/MH-4'
+        })
+    }
+
     User.findById(userId).then(result => {
-        if(vaccineType1 != 0 && vaccineId1 !== '' && date1 != '' && location1 != '')
-        {
-            const vaccineData = [...result.vaccine,Store(vaccineType1,vaccineId1,date1,location1 )];
-            result.updateOne({vaccine:vaccineData, vaccineCount: result.vaccineCount+1}).then(result=>{console.log("Them thanh cong")});
-                if(vaccineType2 != 0 && vaccineId2 !== '' && date2 != '' && location2 != '')
+
+            if(vaccineType2 != 0 || vaccineId2 !== '' || date2 != '' || location2 != '')
+            {
+                if(err.isEmpty())
                 {
+                    const vaccineData = [...result.vaccine,Store(vaccineType1,vaccineId1,date1,location1 )];
                     const vaccineData2 = [...vaccineData,Store(vaccineType2,vaccineId2,date2,location2 )];
-                    result.updateOne({vaccine:vaccineData2, vaccineCount: result.vaccineCount+2}).then(result=>{console.log("Them thanh cong")});
+                    result.updateOne({vaccine:vaccineData, vaccineCount: result.vaccineCount+1}).then(result=>{console.log("Them thanh cong 1")});
+                    result.updateOne({vaccine:vaccineData2, vaccineCount: result.vaccineCount+2}).then(result=>{console.log("Them thanh cong 2")});
+                    return res.redirect("/MH-4");
                 }
-        }
+                else
+                {
+                    return vaccineRegister();
+                }
+            }
+            else
+            {
+                const vaccineData = [...result.vaccine,Store(vaccineType1,vaccineId1,date1,location1 )];
+                result.updateOne({vaccine:vaccineData, vaccineCount: result.vaccineCount+1}).then(result=>{console.log("Them thanh cong")});
+                return res.redirect("/MH-4");
+            }
+
     });
-    return res.redirect("/MH-4");
 }
 
 //render trang CovidReport
 exports.getCovidReport = (req, res, next) => {
-    const errMessage = req.query.errMessage;
     res.render('MH-4/covidreport', {
-        errMessage: errMessage,
+        errMessage: '',
         user: req.user,
         pageTitle: 'Đăng ký dương tính',
         userRoll: req.user.roll,
+        oldData: {
+            address: '',
+            wasF0: '',
+            month: '',
+            quickTest: '',
+            dateTest: '',
+            pcr: ''
+        },
         path: '/MH-4'
     })
 }
@@ -418,60 +464,110 @@ exports.postCovidReport = (req, res, next) => {
     const quickTest = req.body.quickTest;
     const pcr = req.body.pcr;
     const userId = req.user;
-
+    const err = validationResult(req);
+    let errCheck = [];
+    if(!err.isEmpty())
+    {
+        err.array().forEach(val => {
+            errCheck.push(val.param);
+        });
+    }
     //Thêm data nếu không co lỗi thiếu thông tin
-    if (address != '') {
-        let month = '';
-        let dateTest = '';
-        let datePcr = '';
+    let month = '';
+    let dateTest = '';
+    let datePcr = '';
 
-        //Kiểm tra data từ checkbox
-        if (wasF0 == 1)
-            month = req.body.month;
+    function errPage(errMessage) {
+        return res.render('MH-4/covidreport', {
+            errMessage: errMessage,
+            user: req.user,
+            pageTitle: 'Đăng ký dương tính',
+            userRoll: req.user.roll,
+            oldData: {
+                address: address,
+                wasF0: wasF0,
+                month: month,
+                quickTest: quickTest,
+                dateTest: dateTest,
+                pcr: pcr
+            },
+            path: '/MH-4'
+        })
+    }
+    //Kiểm tra data từ checkbox
+    if (wasF0 == 1)
+        {
+            if(errCheck.indexOf('month') == -1)
+            {
+                month = req.body.month;
+            }
+            else
+            {
+                return errPage(err.array()[errCheck.indexOf('month')].msg);
+            }
+        }
         if (quickTest == 1)
-            dateTest = req.body.dateTest;
+        {
+            if(errCheck.indexOf('dateTest') == -1)
+            {
+                dateTest = req.body.dateTest;
+            }
+            else
+            {
+                return errPage(err.array()[errCheck.indexOf('dateTest')].msg);
+            }
+        }
         if (pcr == 1)
-            datePcr = req.body.datePcr;
-        //Lưu thông tin
-        const covidReport = {
-            quarantineAddress: address,
-            wasF0: wasF0,
-            monthF0: month,
-            quickTest: quickTest,
-            dateTest: dateTest,
-            pcr: pcr,
-            datePcr: datePcr
-        };
-        User.findById(userId).updateOne(covidReport)
-            .then(result => {
-                res.redirect('/MH-4');
-            })
-            .catch(err => console.log(err));
-    }
-    //Trả về lỗi khi thiếu data
-    else {
-        var string = encodeURIComponent('Nhập thiếu thông tin');
-        res.redirect('/MH-4/covid-report?errMessage=' + string);
-    }
+        {
+            if(errCheck.indexOf('datePcr') == -1)
+            {
+                datePcr = req.body.datePcr;
+            }
+            else
+            {
+                return errPage(err.array()[errCheck.indexOf('datePcr')].msg);
+            }
+        }
+    //Lưu thông tin
+    const covidReport = {
+        quarantineAddress: address,
+        wasF0: wasF0,
+        monthF0: month,
+        quickTest: quickTest,
+        dateTest: dateTest,
+        pcr: pcr,
+        datePcr: datePcr
+    };
+    User.findById(userId).updateOne(covidReport)
+        .then(result => {
+            return res.redirect('/MH-4');
+        })
+        .catch(err => console.log(err));
+
 }
 
+//quản lý PDF
 exports.getPdf = (req,res,next) => {
     const userId = req.params.userId;
     if(req.user.roll >1)
     {
         User.findById(req.user._id).then(result=>{
             const employee = result.managerOf;
+
+            //Xuất thông tin
             employee.forEach(e=>{
                 if(e==userId){
                     const pdfName = "covid-"+userId+".pdf";
                     const pdfPath = path.join('covid',pdfName);
                     const pdf = new pdfKit();
-                    res.setHeader('Content-Type', 'application/pdf');
-                    res.setHeader('Content-Disposition','attachment; filename="'+pdfName+'"');
+                    res.setHeader('Content-Type', 'application/pdf'); //Khai báo loại file
+                    res.setHeader('Content-Disposition','attachment; filename="'+pdfName+'"'); //Khai báo hình thức tải file
                     pdf.pipe(fs.createWriteStream(pdfPath));
                     pdf.pipe(res);
                     User.findById(userId).then(result => {
                         pdf.fontSize('22').text('Ten nhan vien: ' + result.name);
+
+                        //Nhiệt độ
                         const abc = moment(result.temperatureDate).locale('vn').format("DD/MM/YYYY");
                         if(result.temperature)
                         {
@@ -479,6 +575,8 @@ exports.getPdf = (req,res,next) => {
                             pdf.fontSize('16').text('Than nhiet: ' + result.temperature);
                             pdf.fontSize('16').text('Ngay do: ' + '3/5/2000');
                         }
+
+                        //Mũi Vaccine
                         if(result.vaccine.length>0)
                         {
                             const vaccine = result.vaccine;
@@ -500,6 +598,8 @@ exports.getPdf = (req,res,next) => {
                                 pdf.fontSize('16').text('   + Ngay tiem: ' + moment(vaccine[i].vaccineDate).format("DD/MM/YYYY"));
                             }
                         }
+
+                        //Thông tin cách ly
                         if(result.quarantineAddress)
                         {
                             pdf.fontSize('16').text('Dia chi cach ly: ' + result.quarantineAddress);
@@ -522,6 +622,7 @@ exports.getPdf = (req,res,next) => {
     }
 }
 
+//Xóa lịch sử làm việc
 exports.getHistoryDelete = (req,res,next) => {
     const userId = req.query.userData || null;
     const userWorkId = req.query.del || null;
@@ -559,6 +660,7 @@ exports.getHistoryDelete = (req,res,next) => {
     }
 }
 
+//Khóa user
 exports.postFrozen = (req,res,next) =>{
     const userId = req.query.userId || null;
     const month = req.body.month || null;

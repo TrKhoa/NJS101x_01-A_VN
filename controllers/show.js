@@ -3,9 +3,6 @@ const moment = require('moment');
 const Work = require('../models/work');
 const User = require('../models/user');
 const AnnualLeave = require('../models/annualleave');
-const TemperatureRegister = require('../models/temperatureregister');
-const VaccineRegister = require('../models/vaccineregister');
-const CovidReport = require('../models/covidreport');
 
 //Thêm các Functions tự viết
 const exFunc = require('../util/extraFunction');
