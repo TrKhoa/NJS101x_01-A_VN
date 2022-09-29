@@ -5,10 +5,10 @@
     <nav class="main-header__nav">
         <ul class="main-header__item-list">
             <li class="main-header__item">
-                <a class="<%= path === '/MH-1' ? 'active' : '' %>" href="/">MH-1</a>
+                <a class="<%= path === '/' ? 'active' : '' %>" href="/">MH-1</a>
             </li>
             <li class="main-header__item">
-                <a class="<%= path === '/MH-2' ? 'active' : '' %>" href="/MH-2/profile">MH-2</a>
+                <a class="<%= path === '/MH-2/profile' ? 'active' : '' %>" href="/MH-2/profile">MH-2</a>
             </li>
             <li class="main-header__item">
                 <a class="<%= path === '/MH-3' ? 'active' : '' %>" href="/MH-3">MH-3</a>
@@ -22,7 +22,7 @@
             </li>
             <% } %>
             <li class="main-header__item">
-                <a class="<%= path !== '/MH-6' ? '' : 'd-none' %>" href="/logout">Logout</a>
+                <a href="/logout?page=<%= path %>">Logout</a>
             </li>
         </ul>
     </nav>
@@ -31,10 +31,10 @@
 <nav class="mobile-nav">
         <ul class="mobile-nav__item-list">
                 <li class="mobile-nav__item">
-                    <a class="<%= path === '/MH-1' ? 'active' : '' %>" href="/">MH-1</a>
+                    <a class="<%= path === '/' ? 'active' : '' %>" href="/">MH-1</a>
                 </li>
                 <li class="mobile-nav__item">
-                    <a class="<%= path === '/MH-2' ? 'active' : '' %>" href="/MH-2/profile">MH-2</a>
+                    <a class="<%= path === '/MH-2/profile' ? 'active' : '' %>" href="/MH-2/profile">MH-2</a>
                 </li>
                 <li class="mobile-nav__item">
                     <a class="<%= path === '/MH-3' ? 'active' : '' %>" href="/MH-3">MH-3</a>
@@ -47,6 +47,9 @@
                     <a class="<%= path === '/MH-5' ? 'active' : '' %>" href="/MH-5">MH-5</a>
                 </li>
                 <% } %>
+                <li class="main-header__item">
+                    <a href="/logout?page=<%= path %>">Logout</a>
+                </li>
             </ul>
 </nav>
 <% } %>

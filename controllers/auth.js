@@ -19,6 +19,19 @@ exports.getLogin = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
+    const getCookie = req.get('Cookie').split(';');
+    let lastPage = '/';
+    if(getCookie[1] != undefined )
+    {
+        const cookieProp = getCookie[1].trim().split('=');
+        if(cookieProp[0] == 'lastPage')
+        {
+            lastPage = cookieProp[1];
+        }
+        else {
+            lastPage = getCookie[0].trim().split('=')[1];
+        }
+    }
     const username = req.body.username;
     const password = req.body.password;
     User
@@ -41,7 +54,7 @@ exports.postLogin = (req, res, next) => {
         {
             req.session.isLoggedIn = true;
             req.session.user = user;
-            return res.redirect('/');
+            return res.redirect(lastPage);
         }
         return res.status(422).render('MH-6/login', {
             pageTitle: 'Login',
@@ -58,8 +71,9 @@ exports.postLogin = (req, res, next) => {
 }
 
 exports.getLogout = (req, res, next) => {
-  req.session.destroy(err => {
-    console.log(err);
-    res.redirect('/');
-  });
+    const lastPage = req.query.page || '/';
+    res.setHeader('Set-Cookie', "lastPage="+lastPage);
+    req.session.destroy(err => {
+        res.redirect('/');
+    });
 };

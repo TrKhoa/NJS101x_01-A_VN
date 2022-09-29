@@ -23,7 +23,7 @@ exports.getIndex = (req, res, next) => {
         pageTitle: 'MH-1',
         errorMessage: errorMessage,
         userRoll: req.user.roll,
-        path: '/MH-1'
+        path: '/'
     });
 }
 
@@ -57,7 +57,7 @@ exports.getTodayHistory = (req, res, next) => {
                 workTime: workTime,
                 pageTitle: 'MH-1',
                 userRoll: req.user.roll,
-                path: '/MH-1'
+                path: '/'
             });
 
 
@@ -77,7 +77,7 @@ exports.getProfile = (req, res, next) => {
                 errorMessage: null,
                 pageTitle: 'Profile',
                 userRoll: req.user.roll,
-                path: '/MH-2'
+                path: '/MH-2/profile'
             });
         })
         .catch(err => console.log(err));
