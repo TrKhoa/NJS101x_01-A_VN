@@ -19,7 +19,11 @@ exports.getLogin = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
-    const getCookie = req.get('Cookie').split(';');
+    let getCookie = undefined;
+    if(req.get('Cookie'))
+        getCookie = req.get('Cookie').split(';')
+    else
+        getCookie = [];
     let lastPage = '/';
     if(getCookie[1] != undefined )
     {

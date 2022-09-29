@@ -39,6 +39,10 @@ const userSchema = new Schema({
         type: Number,
         required: true
     },
+    managerId : {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     managerOf: [{
         type: Schema.Types.ObjectId,
         ref: 'User'

@@ -94,7 +94,7 @@ exports.getDashboard = (req, res, next) => {
         userId: req.user
     });
     //Lấy data từ collection User
-    const user = User.findById(req.user);
+    const user = User.findById(req.user).populate('managerId');
 
     //Lấy data từ collection Work
     const work = Work.find({
@@ -141,7 +141,6 @@ exports.getDashboard = (req, res, next) => {
             const getWork = values[1];
             const getAttendance = values[2];
             const getAnnualLeave = values[3];
-
             //Khai báo biến
             const month = req.query.month;
             const salary = req.query.salary;
@@ -149,6 +148,11 @@ exports.getDashboard = (req, res, next) => {
             let workTime = 0;
             let timeLeaving = 0;
             let overTime = 0;
+            let managerName = '';
+            if(getUser.managerId)
+            {
+                managerName = getUser.managerId.name;
+            }
             const latestWork = getWork[0];
 
             //Nếu có data từ attendance thì gán data
@@ -173,6 +177,7 @@ exports.getDashboard = (req, res, next) => {
             //render
             res.render('MH-3/dashboard', {
                 user: getUser,
+                managerName: managerName,
                 work: getWork,
                 itemPerPage: itemPerPage,
                 currentPage: page,
@@ -210,6 +215,7 @@ exports.getCovid = (req, res, next) => {
             path: '/MH-4'
         });
     } else {
+        //Tìm user dưới quyền
         User.findById(userId).populate('managerOf').then(result=>
         {
             const userList = result.managerOf;
@@ -238,6 +244,7 @@ exports.getEmployeeWork = (req, res, next) => {
             if(userList[i]._id==userData)
             {
                 isExist = 1;
+                //Lấy data cần dùng
                 const attendance = userList[i].attendance;
                 if(userList[i].attendance[attendance.length-1]){
                     const works = userList[i].attendance[attendance.length-1].works;
@@ -263,8 +270,11 @@ exports.getEmployeeWork = (req, res, next) => {
                 const work = Work.find({userId: userData}).sort({
                     startAt: -1 //Xếp theo thứ tự Desc
                 });
+
+                //Truyền các data vào promise
                 Promise.all([userList[i],annualLeave,work,attendance]).then(val =>
                 {
+                    //Khai báo biến
                     const userDatas = val[0];
                     const annualLeaves = val[1];
                     const works = val[2];

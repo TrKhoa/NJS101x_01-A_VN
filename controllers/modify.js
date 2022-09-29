@@ -636,17 +636,23 @@ exports.getHistoryDelete = (req,res,next) => {
             const attendance= userData.attendance;
             for(var k = 0; k < attendance.length;k++)
             {
+                //Nếu tìm được ngày
                  if(attendance[k].date.toDateString() == workData.startAt.toDateString())
                  {
                      const attendanceWorks = attendance[k].works;
                      for(var i = 0;i<attendanceWorks.length;i++)
                      {
+                         //Nếu tìm được work
                          if(attendanceWorks[i]==userWorkId)
                          {
                              attendance[k].workTime = attendance[k].workTime - workData.workTime;
                              attendanceWorks.splice(i,1);
+
+                             //Tạo bộ lọc và dữ liệu cập nhật
                              const filter = { _id: userId  };
                              const update = { attendance:  attendance};
+
+                             //Tiến hành cập nhật
                              User.findOneAndUpdate(filter,update).then(result => {
                                  Work.deleteOne({ _id: userWorkId }).then(result => {
                                      return res.redirect('/MH-5?userData='+userId);
@@ -664,6 +670,7 @@ exports.getHistoryDelete = (req,res,next) => {
 exports.postFrozen = (req,res,next) =>{
     const userId = req.query.userId || null;
     const month = req.body.month || null;
+    //Kiểm tra dữ liệu truyền vào
     if(userId && month)
     {
         User.findById(userId).then(user => {
@@ -671,6 +678,8 @@ exports.postFrozen = (req,res,next) =>{
             {
                 const frozen = user.frozen;
                 const thisYear = new Date().getFullYear();
+
+                //Thêm tháng khi cùng năm
                 if(frozen.year == thisYear)
                 {
                     const newMonth = [...frozen.month];
@@ -688,7 +697,7 @@ exports.postFrozen = (req,res,next) =>{
                         return res.redirect('/MH-5?userData='+userId);
                     }
                 }
-                else
+                else //Reset lại mảng khi khác năm
                 {
                     const filter = { _id: userId };
                     const update = { month: [month], year: thisYear};
